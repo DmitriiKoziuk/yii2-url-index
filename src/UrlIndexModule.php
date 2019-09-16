@@ -7,6 +7,7 @@ use yii\di\Container;
 use yii\base\Module;
 use yii\web\Application as WebApp;
 use yii\base\Application as BaseApp;
+use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
 
 class UrlIndexModule extends Module implements ModuleInterface
@@ -71,6 +72,9 @@ class UrlIndexModule extends Module implements ModuleInterface
         if ($app instanceof WebApp && $app->id == $this->frontendAppId) {
             $this->controllerNamespace = __NAMESPACE__ . '\controllers\frontend';
             $this->viewPath = '@DmitriiKoziuk/yii2UrlIndex/views/frontend';
+        }
+        if ($app instanceof ConsoleApp) {
+            $app->controllerMap['migrate']['migrationNamespaces'][] = __NAMESPACE__ . '\migrations';
         }
     }
 

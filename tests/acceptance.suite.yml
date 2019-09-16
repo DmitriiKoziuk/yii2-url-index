@@ -1,0 +1,8 @@
+suite_namespace: DmitriiKoziuk\yii2UrlIndex\tests\acceptance
+actor: AcceptanceTester
+modules:
+    enabled:
+        - PhpBrowser:
+              url: http://b.yii2-extensions.t/
+        - Yii2:
+            part: [init, fixtures]
