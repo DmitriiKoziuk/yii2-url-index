@@ -1,0 +1,34 @@
+{
+  "name": "dmitriikoziuk/yii2-url-index",
+  "description": "Yii2 url index.",
+  "type": "yii2-extension",
+  "keywords": [
+    "yii2",
+    "url index"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Dmitrii Koziuk",
+      "email": "dmitriikoziuk@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=7.1.0",
+    "yiisoft/yii2": "~2.0.0",
+    "dmitriikoziuk/yii2-base": "*",
+    "dmitriikoziuk/yii2-module-manager": "*",
+    "dmitriikoziuk/yii2-config-manager": "*",
+    "dmitriikoziuk/yii2-web-backend-lock": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "DmitriiKoziuk\\yii2UrlIndex\\": "src",
+      "DmitriiKoziuk\\yii2UrlIndex\\tests\\": "tests"
+    }
+  },
+  "extra": {
+    "bootstrap": "DmitriiKoziuk\\yii2UrlIndex\\Bootstrap"
+  }
+}
