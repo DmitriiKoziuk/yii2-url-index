@@ -7,6 +7,7 @@ use DmitriiKoziuk\yii2UrlIndex\tests\fixtures\UserFixture;
 class MainCest
 {
     private $loggedInCookie;
+    private $createdPageId;
 
     public function _fixtures()
     {
@@ -71,16 +72,17 @@ class MainCest
         $I->amOnPage('/dk-url-index/url/create');
         $I->seeResponseCodeIs(200);
         $I->see('Create Url', 'h1');
-        $I->fillField('UrlIndexEntity[url]', '/some-url.html');
-        $I->fillField('UrlIndexEntity[redirect_to_url]', '/to-new-url.html');
-        $I->fillField('UrlIndexEntity[module_name]', 'module');
-        $I->fillField('UrlIndexEntity[controller_name]', 'controller');
-        $I->fillField('UrlIndexEntity[action_name]', 'action');
-        $I->fillField('UrlIndexEntity[entity_id]', '1');
+        $I->fillField('UrlEntity[url]', '/some-url.html');
+        $I->fillField('UrlEntity[redirect_to_url]', '/to-new-url.html');
+        $I->fillField('UrlEntity[module_name]', 'module');
+        $I->fillField('UrlEntity[controller_name]', 'controller');
+        $I->fillField('UrlEntity[action_name]', 'action');
+        $I->fillField('UrlEntity[entity_id]', '1');
         $I->click('#save-url');
         $I->seeResponseCodeIs(200);
         $I->see('Url created', 'h1');
         $I->see('Created At');
+        $this->createdPageId = $I->grabFromCurrentUrl('~id=(\d+)$~');
     }
 
     /**
@@ -90,7 +92,7 @@ class MainCest
     public function tryDeleteUrl(AcceptanceTester $I)
     {
         $I->setcookie('advanced-backend', $this->loggedInCookie);
-        $I->amOnPage('/dk-url-index/url/view?id=1');
+        $I->amOnPage("/dk-url-index/url/view?id={$this->createdPageId}");
         $I->click('#delete-url');
         $I->seeResponseCodeIs(200);
     }
