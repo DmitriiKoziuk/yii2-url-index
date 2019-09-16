@@ -45,8 +45,7 @@ class m190904_140453_create_dk_url_index_urls_table extends Migration
                 'controller_name',
                 'action_name',
                 'entity_id',
-            ],
-            true
+            ]
         );
     }
 
