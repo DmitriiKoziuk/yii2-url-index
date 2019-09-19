@@ -2,14 +2,11 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\repositories;
 
-use DmitriiKoziuk\yii2Base\interfaces\ActiveRecordRepositoryInterface;
 use DmitriiKoziuk\yii2Base\repositories\AbstractActiveRecordRepository;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 
-class UrlRepository extends AbstractActiveRecordRepository implements
-    UrlRepositoryInterface,
-    ActiveRecordRepositoryInterface
+class UrlRepository extends AbstractActiveRecordRepository implements UrlRepositoryInterface
 {
     public function getById(int $id): ?UrlEntity
     {
