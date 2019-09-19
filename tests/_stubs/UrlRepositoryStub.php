@@ -5,9 +5,8 @@ namespace DmitriiKoziuk\yii2UrlIndex\tests\_stubs;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use yii\db\ActiveRecord;
-use DmitriiKoziuk\yii2Base\interfaces\ActiveRecordRepositoryInterface;
 
-class UrlRepositoryStub implements UrlRepositoryInterface, ActiveRecordRepositoryInterface
+class UrlRepositoryStub implements UrlRepositoryInterface
 {
     public function getById(int $id): ?UrlEntity
     {
