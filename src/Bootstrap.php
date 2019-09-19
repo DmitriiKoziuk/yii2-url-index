@@ -7,13 +7,18 @@ use Yii;
 use yii\base\BootstrapInterface;
 use DmitriiKoziuk\yii2ConfigManager\ConfigManagerModule;
 use DmitriiKoziuk\yii2ConfigManager\services\ConfigService;
-use DmitriiKoziuk\yii2ModuleManager\services\ModuleInitService;
+use DmitriiKoziuk\yii2ModuleManager\services\ModuleRegistrationService;
 
 class Bootstrap implements BootstrapInterface
 {
+    /**
+     * @param \yii\base\Application $app
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
+     */
     public function bootstrap($app)
     {
-        ModuleInitService::registerModule(UrlIndexModule::class, function () {
+        ModuleRegistrationService::addModule(UrlIndexModule::class, function () {
             /** @var ConfigService $configService */
             $configService = Yii::$container->get(ConfigService::class);
             return [
