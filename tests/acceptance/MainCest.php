@@ -2,7 +2,7 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
-use DmitriiKoziuk\yii2UrlIndex\tests\fixtures\UserFixture;
+use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
 
 class MainCest
 {

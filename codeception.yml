@@ -5,11 +5,14 @@ paths:
     output: tests/_output
     data: tests/_data
     support: tests/_support
+bootstrap: _bootstrap.php
 settings:
-    bootstrap: _bootstrap.php
     colors: true
     memory_limit: 1024M
 modules:
     config:
         Yii2:
-            configFile: '../../../backend/config/test-local.php'
+            configFile: 'tests/_app/config/backend-test.php'
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
