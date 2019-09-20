@@ -9,12 +9,25 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntitySearch;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
 
 /**
  * FileController implements the CRUD actions for UrlIndexEntity model.
  */
 class UrlController extends Controller
 {
+    /**
+     * @var UrlService
+     */
+    private $urlService;
+
+    public function __construct($id, $module, UrlService $urlService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->urlService = $urlService;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -24,7 +37,7 @@ class UrlController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'delete' => ['GET'],
+                    'delete' => ['GET', 'POST'],
                 ],
             ],
         ];
@@ -59,20 +72,22 @@ class UrlController extends Controller
     }
 
     /**
-     * Creates a new UrlIndexEntity model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return string|\yii\web\Response
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
      */
     public function actionCreate()
     {
-        $model = new UrlEntity();
+        $createForm = new UrlCreateForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($createForm->load(Yii::$app->request->post())) {
+            $form = $this->urlService->createUrl($createForm);
+            return $this->redirect(['view', 'id' => $form->id]);
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'model' => $createForm,
         ]);
     }
 
