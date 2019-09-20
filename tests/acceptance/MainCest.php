@@ -72,12 +72,12 @@ class MainCest
         $I->amOnPage('/dk-url-index/url/create');
         $I->seeResponseCodeIs(200);
         $I->see('Create Url', 'h1');
-        $I->fillField('UrlEntity[url]', '/some-url.html');
-        $I->fillField('UrlEntity[redirect_to_url]', '/to-new-url.html');
-        $I->fillField('UrlEntity[module_name]', 'module');
-        $I->fillField('UrlEntity[controller_name]', 'controller');
-        $I->fillField('UrlEntity[action_name]', 'action');
-        $I->fillField('UrlEntity[entity_id]', '1');
+        $I->fillField('UrlCreateForm[url]', '/some-url.html');
+        $I->fillField('UrlCreateForm[redirect_to_url]', '/to-new-url.html');
+        $I->fillField('UrlCreateForm[module_name]', 'module');
+        $I->fillField('UrlCreateForm[controller_name]', 'controller');
+        $I->fillField('UrlCreateForm[action_name]', 'action');
+        $I->fillField('UrlCreateForm[entity_id]', '1');
         $I->click('#save-url');
         $I->seeResponseCodeIs(200);
         $I->see('Url created', 'h1');
