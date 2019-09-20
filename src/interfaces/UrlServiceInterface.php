@@ -13,9 +13,9 @@ interface UrlServiceInterface
         Connection $db = null
     );
 
-    public function createUrl(UrlCreateForm $urlCreateForm);
+    public function createUrl(UrlCreateForm $urlCreateForm): UrlUpdateForm;
 
-    public function updateUrl(UrlUpdateForm $urlUpdateForm);
+    public function updateUrl(UrlUpdateForm $urlUpdateForm): UrlUpdateForm;
 
-    public function deleteUrl(string $url);
+    public function deleteUrl(string $url): void;
 }
