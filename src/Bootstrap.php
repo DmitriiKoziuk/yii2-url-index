@@ -18,12 +18,13 @@ class Bootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        ModuleRegistrationService::addModule(UrlIndexModule::class, function () {
+        ModuleRegistrationService::addModule(UrlIndexModule::class, function () use ($app) {
             /** @var ConfigService $configService */
             $configService = Yii::$container->get(ConfigService::class);
             return [
                 'class' => UrlIndexModule::class,
                 'diContainer' => Yii::$container,
+                'dbConnection' => $app->db,
                 'backendAppId' => $configService->getValue(
                     ConfigManagerModule::GENERAL_CONFIG_NAME,
                     'backendAppId'
