@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace DmitriiKoziuk\yii2UrlIndex;
 
 use yii\di\Container;
+use yii\db\Connection;
 use yii\base\Module;
 use yii\web\Application as WebApp;
 use yii\base\Application as BaseApp;
 use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
+use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
 
 class UrlIndexModule extends Module implements ModuleInterface
 {
@@ -20,6 +23,11 @@ class UrlIndexModule extends Module implements ModuleInterface
      * @var Container
      */
     public $diContainer;
+
+    /**
+     * @var Connection
+     */
+    public $dbConnection;
 
     /**
      * Overwrite this param if you backend app id is different from default.
@@ -87,7 +95,29 @@ class UrlIndexModule extends Module implements ModuleInterface
         ];
     }
 
+    /**
+     * @param BaseApp $app
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
+     */
     private function registerClassesToDIContainer(BaseApp $app): void
     {
+        $this->diContainer->setSingleton(
+            UrlRepository::class,
+            function () {
+                return new UrlRepository();
+            }
+        );
+        /** @var UrlRepository $urlRepository */
+        $urlRepository = $this->diContainer->get(UrlRepository::class);
+
+        $this->diContainer->setSingleton(UrlService::class, function () use (
+            $urlRepository
+        ) {
+            return new UrlService(
+                $urlRepository,
+                $this->dbConnection
+            );
+        });
     }
 }
