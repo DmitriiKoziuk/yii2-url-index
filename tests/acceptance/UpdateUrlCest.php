@@ -48,14 +48,14 @@ class UpdateUrlCest
         $I->amOnPage("/dk-url-index/url/update?id={$existUrls['id']}");
         $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
 
-        $I->fillField(['name' => "UrlEntity[url]"], $dataForUpdate['url']);
+        $I->fillField(['name' => "UrlUpdateForm[url]"], $dataForUpdate['url']);
         $value = $dataForUpdate['redirect_to_url'] ?? '';
-        $I->fillField(['name' => 'UrlEntity[redirect_to_url]'], $value);
+        $I->fillField(['name' => 'UrlUpdateForm[redirect_to_url]'], $value);
         $value = $dataForUpdate['module_name'] ?? '';
-        $I->fillField(['name' => 'UrlEntity[module_name]'], $value);
-        $I->fillField(['name' => 'UrlEntity[controller_name]'], $dataForUpdate['controller_name']);
-        $I->fillField(['name' => 'UrlEntity[action_name]'], $dataForUpdate['action_name']);
-        $I->fillField(['name' => 'UrlEntity[action_name]'], $dataForUpdate['action_name']);
+        $I->fillField(['name' => 'UrlUpdateForm[module_name]'], $value);
+        $I->fillField(['name' => 'UrlUpdateForm[controller_name]'], $dataForUpdate['controller_name']);
+        $I->fillField(['name' => 'UrlUpdateForm[action_name]'], $dataForUpdate['action_name']);
+        $I->fillField(['name' => 'UrlUpdateForm[action_name]'], $dataForUpdate['action_name']);
         $I->click('#save-url');
 
         $I->seeResponseCodeIs(200);
