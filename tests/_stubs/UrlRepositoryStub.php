@@ -2,41 +2,33 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests\_stubs;
 
+use yii\db\ActiveRecord;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
-use yii\db\ActiveRecord;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 
 class UrlRepositoryStub implements UrlRepositoryInterface
 {
-    private $id;
+    private $data;
 
-    private $created_at;
-
-    private $updated_at;
-
-    public function __construct(int $id, string $created_at, string $updated_at)
+    public function __construct(array $data = null)
     {
-        $this->id = $id;
-        $this->created_at = $created_at;
-        $this->updated_at = $updated_at;
+        $this->data = empty($data) ? null : new UrlUpdateForm($data);
     }
 
     public function getById(int $id): ?UrlEntity
     {
-        return null;
+        return empty($this->data) ? null : new UrlEntity($this->data->getAttributes());
     }
 
     public function getByUrl(string $url): ?UrlEntity
     {
-        return null;
+        return empty($this->data) ? null : new UrlEntity($this->data->getAttributes());
     }
 
     public function save(ActiveRecord $activeRecord): ActiveRecord
     {
-        $activeRecord->id = $this->id;
-        $activeRecord->created_at = $this->created_at;
-        $activeRecord->updated_at = $this->updated_at;
-        return $activeRecord;
+        return new UrlEntity($this->data->getAttributes());
     }
 
     public function delete(ActiveRecord $activeRecord): void
