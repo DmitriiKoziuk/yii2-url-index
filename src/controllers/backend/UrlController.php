@@ -9,7 +9,6 @@ use yii\filters\VerbFilter;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntitySearch;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
-use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
 
 /**
@@ -100,19 +99,15 @@ class UrlController extends Controller
      * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
-        $model = new UrlUpdateForm();
-        $entity = $this->findModel($id);
-        $model->setAttributes($entity->getAttributes());
-
-        if ($model->load(Yii::$app->request->post())) {
-            $model = $this->urlService->updateUrl($model);
-            return $this->redirect(['view', 'id' => $model->id]);
+        $urlUpdateForm = $this->urlService->getUrlById($id);
+        if ($urlUpdateForm->load(Yii::$app->request->post())) {
+            $urlUpdateForm = $this->urlService->updateUrl($urlUpdateForm);
+            return $this->redirect(['view', 'id' => $urlUpdateForm->id]);
         }
-
         return $this->render('update', [
-            'model' => $model,
+            'model' => $urlUpdateForm,
         ]);
     }
 
