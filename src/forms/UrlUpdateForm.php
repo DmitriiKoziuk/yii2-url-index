@@ -17,7 +17,7 @@ class UrlUpdateForm extends UrlCreateForm
     {
         return [
             [
-                ['url', 'controller_name', 'action_name', 'entity_id'],
+                ['id', 'url', 'controller_name', 'action_name', 'entity_id'],
                 'required'
             ],
             [
@@ -36,7 +36,7 @@ class UrlUpdateForm extends UrlCreateForm
                 'value' => null
             ],
             [
-                ['created_at', 'updated_at'],
+                ['id', 'created_at', 'updated_at'],
                 'integer'
             ],
         ];
