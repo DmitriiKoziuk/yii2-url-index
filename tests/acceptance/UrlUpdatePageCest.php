@@ -41,6 +41,21 @@ class UrlUpdatePageCest
      * @depends trySignIn
      * @dataProvider urlDataProvider
      */
+    public function tryOpenUpdatePage(AcceptanceTester $I, Example $existUrls)
+    {
+        $I->wantTo('Check is url update page open.');
+        $I->amOnPage("/dk-url-index/url/update?id={$existUrls['id']}");
+        $I->seeResponseCodeIs(200);
+
+        $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
+    }
+
+    /**
+     * @param AcceptanceTester $I
+     * @param Example $existUrls
+     * @depends tryOpenUpdatePage
+     * @dataProvider urlDataProvider
+     */
     public function existsOnPage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is all field exist on page.');
@@ -48,18 +63,18 @@ class UrlUpdatePageCest
         $I->seeResponseCodeIs(200);
         $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
 
-        $I->seeElement('input', ['name' => "UrlEntity[url]"]);
-        $I->seeElement('input', ['name' => 'UrlEntity[redirect_to_url]']);
-        $I->seeElement('input', ['name' => 'UrlEntity[module_name]']);
-        $I->seeElement('input', ['name' => 'UrlEntity[controller_name]']);
-        $I->seeElement('input', ['name' => 'UrlEntity[action_name]']);
-        $I->seeElement('input', ['name' => 'UrlEntity[entity_id]']);
+        $I->seeElement('input', ['name' => "UrlUpdateForm[url]"]);
+        $I->seeElement('input', ['name' => 'UrlUpdateForm[redirect_to_url]']);
+        $I->seeElement('input', ['name' => 'UrlUpdateForm[module_name]']);
+        $I->seeElement('input', ['name' => 'UrlUpdateForm[controller_name]']);
+        $I->seeElement('input', ['name' => 'UrlUpdateForm[action_name]']);
+        $I->seeElement('input', ['name' => 'UrlUpdateForm[entity_id]']);
     }
 
     /**
      * @param AcceptanceTester $I
      * @param Example $existUrls
-     * @depends trySignIn
+     * @depends tryOpenUpdatePage
      * @dataProvider urlDataProvider
      */
     public function hasRelevantData(AcceptanceTester $I, Example $existUrls)
@@ -69,20 +84,20 @@ class UrlUpdatePageCest
         $I->seeResponseCodeIs(200);
         $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
 
-        $I->seeInField(['name' => "UrlEntity[url]"], $existUrls['url']);
+        $I->seeInField(['name' => "UrlUpdateForm[url]"], $existUrls['url']);
         $value = $existUrls['redirect_to_url'] ?? '';
-        $I->seeInField(['name' => 'UrlEntity[redirect_to_url]'], $value);
+        $I->seeInField(['name' => 'UrlUpdateForm[redirect_to_url]'], $value);
         $value = $existUrls['module_name'] ?? '';
-        $I->seeInField(['name' => 'UrlEntity[module_name]'], $value);
-        $I->seeInField(['name' => 'UrlEntity[controller_name]'], $existUrls['controller_name']);
-        $I->seeInField(['name' => 'UrlEntity[action_name]'], $existUrls['action_name']);
-        $I->seeInField(['name' => 'UrlEntity[action_name]'], $existUrls['action_name']);
+        $I->seeInField(['name' => 'UrlUpdateForm[module_name]'], $value);
+        $I->seeInField(['name' => 'UrlUpdateForm[controller_name]'], $existUrls['controller_name']);
+        $I->seeInField(['name' => 'UrlUpdateForm[action_name]'], $existUrls['action_name']);
+        $I->seeInField(['name' => 'UrlUpdateForm[action_name]'], $existUrls['action_name']);
     }
 
     /**
      * @param AcceptanceTester $I
      * @param Example $existUrls
-     * @depends trySignIn
+     * @depends tryOpenUpdatePage
      * @dataProvider urlDataProvider
      */
     public function hasSaveButton(AcceptanceTester $I, Example $existUrls)
