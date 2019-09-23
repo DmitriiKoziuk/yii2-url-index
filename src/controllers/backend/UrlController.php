@@ -102,6 +102,9 @@ class UrlController extends Controller
     public function actionUpdate(int $id)
     {
         $urlUpdateForm = $this->urlService->getUrlById($id);
+        if (empty($urlUpdateForm)) {
+            throw new NotFoundHttpException("Url with id '{$id}' not found.");
+        }
         if ($urlUpdateForm->load(Yii::$app->request->post())) {
             $urlUpdateForm = $this->urlService->updateUrl($urlUpdateForm);
             return $this->redirect(['view', 'id' => $urlUpdateForm->id]);

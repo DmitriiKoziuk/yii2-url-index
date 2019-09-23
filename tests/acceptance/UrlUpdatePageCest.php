@@ -52,6 +52,19 @@ class UrlUpdatePageCest
 
     /**
      * @param AcceptanceTester $I
+     * @depends trySignIn
+     * @dataProvider urlDataProvider
+     */
+    public function tryOpenUpdatePageForNonExistUrl(AcceptanceTester $I)
+    {
+        $I->wantTo('check is non exist url update page send status code 404.');
+        $id = rand(100, 1000);
+        $I->amOnPage("/dk-url-index/url/update?id={$id}");
+        $I->seeResponseCodeIs(404);
+    }
+
+    /**
+     * @param AcceptanceTester $I
      * @param Example $existUrls
      * @depends tryOpenUpdatePage
      * @dataProvider urlDataProvider
