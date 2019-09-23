@@ -53,7 +53,7 @@ class UrlUpdatePageCest
         $I->seeElement('input', ['name' => 'UrlEntity[module_name]']);
         $I->seeElement('input', ['name' => 'UrlEntity[controller_name]']);
         $I->seeElement('input', ['name' => 'UrlEntity[action_name]']);
-        $I->seeElement('input', ['name' => 'UrlEntity[action_name]']);
+        $I->seeElement('input', ['name' => 'UrlEntity[entity_id]']);
     }
 
     /**
