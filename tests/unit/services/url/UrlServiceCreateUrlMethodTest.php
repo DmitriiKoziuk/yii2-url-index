@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace DmitriiKoziuk\yii2UrlIndex\tests\unit;
+namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\url;
 
+use Yii;
+use yii\di\Container;
 use Codeception\Test\Unit;
 use DmitriiKoziuk\yii2Base\exceptions\DataNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException;
@@ -12,7 +14,7 @@ use DmitriiKoziuk\yii2UrlIndex\tests\_stubs\UrlRepositoryStub;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
 
-class UrlServiceTest extends Unit
+class UrlServiceCreateUrlMethodTest extends Unit
 {
     /**
      * @var UnitTester
@@ -21,6 +23,7 @@ class UrlServiceTest extends Unit
     
     protected function _before()
     {
+        Yii::$container = new Container();
     }
 
     protected function _after()
