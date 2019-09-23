@@ -40,7 +40,7 @@ class UrlServiceCreateUrlMethodTest extends Unit
     public function testCreateMethodWithValidData(array $data)
     {
         $service = new UrlService(
-            new UrlRepositoryStub($data['id'], $data['created_at'], $data['updated_at']),
+            new UrlRepositoryStub($data),
             null
         );
         $createFormData = $data;
@@ -63,7 +63,7 @@ class UrlServiceCreateUrlMethodTest extends Unit
     public function testCreateMethodThrowInvalidFormException()
     {
         $service = new UrlService(
-            new UrlRepositoryStub(1, '', ''),
+            new UrlRepositoryStub(),
             null
         );
 
