@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace DmitriiKoziuk\yii2UrlIndex\controllers\backend;
 
@@ -10,6 +9,7 @@ use yii\filters\VerbFilter;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntitySearch;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
 
 /**
@@ -92,17 +92,22 @@ class UrlController extends Controller
     }
 
     /**
-     * Updates an existing UrlIndexEntity model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = new UrlUpdateForm();
+        $entity = $this->findModel($id);
+        $model->setAttributes($entity->getAttributes());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $model = $this->urlService->updateUrl($model);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
