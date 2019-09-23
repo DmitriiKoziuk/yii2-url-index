@@ -83,6 +83,15 @@ class UrlService extends DBActionService implements UrlServiceInterface
         throw new \Exception('Method not implement.');
     }
 
+    public function getUrlById(int $id): ?UrlUpdateForm
+    {
+        $urlEntity = $this->urlRepository->getById($id);
+        if (empty($urlEntity)) {
+            return null;
+        }
+        return new UrlUpdateForm($urlEntity->getAttributes());
+    }
+
     /**
      * @param UrlEntity $urlEntity
      * @return UrlEntity
