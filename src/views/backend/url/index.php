@@ -29,8 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'url:url',
-            'redirect_to_url:url',
+            'url',
+            'redirect_to_url',
             'module_name',
             'controller_name',
             'action_name',
