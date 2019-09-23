@@ -48,13 +48,7 @@ class UrlService extends DBActionService implements UrlServiceInterface
         );
         $urlEntity = new UrlEntity();
         $urlEntity->setAttributes($urlCreateForm->getAttributes());
-        try {
-            $urlEntity = $this->urlRepository->save($urlEntity);
-        } catch (EntityNotValidException| EntitySaveException $e) {
-            $externalException = new ExternalComponentException();
-            $externalException->addErrors([$e]);
-            throw $externalException;
-        }
+        $urlEntity = $this->save($urlEntity);
         $urlForm = new UrlUpdateForm($urlEntity->getAttributes());
         return $urlForm;
     }
@@ -78,13 +72,7 @@ class UrlService extends DBActionService implements UrlServiceInterface
             throw new EntityNotFoundException("UrlEntity with id '{$urlUpdateForm->id}' not found.");
         }
         $urlEntity->setAttributes($urlUpdateForm->getAttributes());
-        try {
-            $urlEntity = $this->urlRepository->save($urlEntity);
-        } catch (EntityNotValidException| EntitySaveException $e) {
-            $externalException = new ExternalComponentException();
-            $externalException->addErrors([$e]);
-            throw $externalException;
-        }
+        $urlEntity = $this->save($urlEntity);
         $urlForm = new UrlUpdateForm($urlEntity->getAttributes());
 
         return $urlForm;
@@ -93,5 +81,23 @@ class UrlService extends DBActionService implements UrlServiceInterface
     public function deleteUrl(string $url): void
     {
         throw new \Exception('Method not implement.');
+    }
+
+    /**
+     * @param UrlEntity $urlEntity
+     * @return UrlEntity
+     * @throws ExternalComponentException
+     */
+    private function save(UrlEntity $urlEntity)
+    {
+        try {
+            /** @var UrlEntity $urlEntity */
+            $urlEntity = $this->urlRepository->save($urlEntity);
+        } catch (EntityNotValidException| EntitySaveException $e) {
+            $externalException = new ExternalComponentException();
+            $externalException->addErrors([$e]);
+            throw $externalException;
+        }
+        return $urlEntity;
     }
 }
