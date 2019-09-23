@@ -10,6 +10,7 @@ use DmitriiKoziuk\yii2Base\exceptions\InvalidFormException;
 use DmitriiKoziuk\yii2Base\exceptions\EntityNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\EntitySaveException;
 use DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException;
+use DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
@@ -58,9 +59,35 @@ class UrlService extends DBActionService implements UrlServiceInterface
         return $urlForm;
     }
 
+    /**
+     * @param UrlUpdateForm $urlUpdateForm
+     * @return UrlUpdateForm
+     * @throws DataNotValidException|InvalidFormException
+     * @throws EntityNotFoundException
+     * @throws ExternalComponentException
+     */
     public function updateUrl(UrlUpdateForm $urlUpdateForm): UrlUpdateForm
     {
-        throw new \Exception('Method not implement.');
+        $this->validateModels(
+            [$urlUpdateForm],
+            new InvalidFormException('UrlUpdateForm not valid.')
+        );
+
+        $urlEntity = $this->urlRepository->getById($urlUpdateForm->id);
+        if (empty($urlEntity)) {
+            throw new EntityNotFoundException("UrlEntity with id '{$urlUpdateForm->id}' not found.");
+        }
+        $urlEntity->setAttributes($urlUpdateForm->getAttributes());
+        try {
+            $urlEntity = $this->urlRepository->save($urlEntity);
+        } catch (EntityNotValidException| EntitySaveException $e) {
+            $externalException = new ExternalComponentException();
+            $externalException->addErrors([$e]);
+            throw $externalException;
+        }
+        $urlForm = new UrlUpdateForm($urlEntity->getAttributes());
+
+        return $urlForm;
     }
 
     public function deleteUrl(string $url): void
