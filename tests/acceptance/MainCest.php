@@ -7,7 +7,6 @@ use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
 class MainCest
 {
     private $loggedInCookie;
-    private $createdPageId;
 
     public function _fixtures()
     {
@@ -46,54 +45,5 @@ class MainCest
         $I->click('Url index', '.dropdown-menu');
         $I->seeResponseCodeIs(200);
         $I->see('Urls');
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     * @depends trySignIn
-     */
-    public function tryClickToCreateUrlLink(AcceptanceTester $I)
-    {
-        $I->setcookie('advanced-backend', $this->loggedInCookie);
-        $I->amOnPage('/dk-url-index/url/index');
-        $I->seeResponseCodeIs(200);
-        $I->click('Create Url Index Entity');
-        $I->seeResponseCodeIs(200);
-        $I->see('Create Url', 'h1');
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     * @depends trySignIn
-     */
-    public function tryCreateUrlWithAllFieldSet(AcceptanceTester $I)
-    {
-        $I->setcookie('advanced-backend', $this->loggedInCookie);
-        $I->amOnPage('/dk-url-index/url/create');
-        $I->seeResponseCodeIs(200);
-        $I->see('Create Url', 'h1');
-        $I->fillField('UrlCreateForm[url]', '/some-url.html');
-        $I->fillField('UrlCreateForm[redirect_to_url]', '/to-new-url.html');
-        $I->fillField('UrlCreateForm[module_name]', 'module');
-        $I->fillField('UrlCreateForm[controller_name]', 'controller');
-        $I->fillField('UrlCreateForm[action_name]', 'action');
-        $I->fillField('UrlCreateForm[entity_id]', '1');
-        $I->click('#save-url');
-        $I->seeResponseCodeIs(200);
-        $I->see('Url created', 'h1');
-        $I->see('Created At');
-        $this->createdPageId = $I->grabFromCurrentUrl('~id=(\d+)$~');
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     * @depends tryCreateUrlWithAllFieldSet
-     */
-    public function tryDeleteUrl(AcceptanceTester $I)
-    {
-        $I->setcookie('advanced-backend', $this->loggedInCookie);
-        $I->amOnPage("/dk-url-index/url/view?id={$this->createdPageId}");
-        $I->click('#delete-url');
-        $I->seeResponseCodeIs(200);
     }
 }
