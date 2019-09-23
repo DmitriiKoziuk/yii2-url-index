@@ -1,0 +1,36 @@
+<?php
+return [
+    'url1' => [
+        'id' => 1,
+        'url' => '/news',
+        'redirect_to_url' => NULL,
+        'module_name' => 'news',
+        'controller_name' => 'news',
+        'action_name' => 'index',
+        'entity_id' => '',
+        'created_at' => '1392559490',
+        'updated_at' => '1392559490',
+    ],
+    'url2' => [
+        'id' => 2,
+        'url' => '/shop/product/iphone-11.html',
+        'redirect_to_url' => NULL,
+        'module_name' => 'shop',
+        'controller_name' => 'product',
+        'action_name' => 'index',
+        'entity_id' => '2',
+        'created_at' => '1392569490',
+        'updated_at' => '1392569490',
+    ],
+    'url3' => [
+        'id' => 3,
+        'url' => '/feedback.php',
+        'redirect_to_url' => '/feedback',
+        'module_name' => NULL,
+        'controller_name' => 'feedback',
+        'action_name' => 'index',
+        'entity_id' => '',
+        'created_at' => '1392569490',
+        'updated_at' => '1392569490',
+    ],
+];
