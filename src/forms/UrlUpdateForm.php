@@ -2,8 +2,6 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\forms;
 
-use yii\helpers\ArrayHelper;
-
 class UrlUpdateForm extends UrlCreateForm
 {
     public $id;
@@ -12,13 +10,35 @@ class UrlUpdateForm extends UrlCreateForm
 
     public $updated_at;
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
-        return ArrayHelper::merge(
-            parent::rules(),
+        return [
             [
-                ['id', 'created_at', 'updated_at'], 'integer'
-            ]
-        );
+                ['url', 'controller_name', 'action_name', 'entity_id'],
+                'required'
+            ],
+            [
+                ['url', 'redirect_to_url'],
+                'string',
+                'max' => 255
+            ],
+            [
+                ['module_name', 'controller_name', 'action_name', 'entity_id'],
+                'string',
+                'max' => 45
+            ],
+            [
+                ['module_name', 'redirect_to_url'],
+                'default',
+                'value' => null
+            ],
+            [
+                ['created_at', 'updated_at'],
+                'integer'
+            ],
+        ];
     }
 }
