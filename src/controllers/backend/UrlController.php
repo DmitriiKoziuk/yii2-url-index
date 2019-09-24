@@ -6,7 +6,6 @@ use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntitySearch;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
@@ -63,10 +62,14 @@ class UrlController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView(int $id)
     {
+        $model = $this->urlIndexService->getUrlById($id);
+        if (empty($model)) {
+            throw new NotFoundHttpException("Url with id '{$id}' not found.");
+        }
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -75,6 +78,7 @@ class UrlController extends Controller
      * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
+     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyExistException
      */
     public function actionCreate()
     {
@@ -129,21 +133,5 @@ class UrlController extends Controller
         }
         $this->urlIndexService->removeUrl($url['url']);
         return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the UrlIndexEntity model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return UrlEntity the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = UrlEntity::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }
