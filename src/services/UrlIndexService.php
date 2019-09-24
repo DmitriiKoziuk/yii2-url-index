@@ -40,7 +40,7 @@ class UrlIndexService extends DBActionService implements UrlServiceInterface
      * @throws ExternalComponentException
      * @return UrlUpdateForm
      */
-    public function createUrl(UrlCreateForm $urlCreateForm): UrlUpdateForm
+    public function addUrl(UrlCreateForm $urlCreateForm): UrlUpdateForm
     {
         $this->validateModels(
             [$urlCreateForm],

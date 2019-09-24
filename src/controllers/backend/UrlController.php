@@ -81,7 +81,7 @@ class UrlController extends Controller
         $createForm = new UrlCreateForm();
 
         if ($createForm->load(Yii::$app->request->post())) {
-            $form = $this->urlIndexService->createUrl($createForm);
+            $form = $this->urlIndexService->addUrl($createForm);
             return $this->redirect(['view', 'id' => $form->id]);
         }
 

@@ -14,7 +14,7 @@ use DmitriiKoziuk\yii2UrlIndex\tests\_stubs\UrlRepositoryStub;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
-class UrlIndexServiceCreateUrlMethodTest extends Unit
+class UrlIndexServiceAddUrlMethodTest extends Unit
 {
     /**
      * @var UnitTester
@@ -37,7 +37,7 @@ class UrlIndexServiceCreateUrlMethodTest extends Unit
      * @throws InvalidFormException
      * @dataProvider validUrlCreateFormDataProvider
      */
-    public function testCreateMethodWithValidData(array $data)
+    public function testWithValidData(array $data): void
     {
         $service = new UrlIndexService(
             new UrlRepositoryStub($data),
@@ -49,7 +49,7 @@ class UrlIndexServiceCreateUrlMethodTest extends Unit
         $createForm = new UrlCreateForm($createFormData);
         $this->assertTrue($createForm->validate());
 
-        $returnForm = $service->createUrl($createForm);
+        $returnForm = $service->addUrl($createForm);
         $this->assertInstanceOf(
             UrlUpdateForm::class,
             $returnForm
@@ -60,7 +60,7 @@ class UrlIndexServiceCreateUrlMethodTest extends Unit
         );
     }
 
-    public function testCreateMethodThrowInvalidFormException()
+    public function testThrowInvalidFormException(): void
     {
         $service = new UrlIndexService(
             new UrlRepositoryStub(),
@@ -70,10 +70,10 @@ class UrlIndexServiceCreateUrlMethodTest extends Unit
         $createForm = new UrlCreateForm();
         $this->assertFalse($createForm->validate());
         $this->expectException(InvalidFormException::class);
-        $service->createUrl($createForm);
+        $service->addUrl($createForm);
     }
 
-    public function validUrlCreateFormDataProvider()
+    public function validUrlCreateFormDataProvider(): array
     {
         $fixtures = include codecept_data_dir() . 'url_data.php';
         $fixtures = array_map(function ($array) {
