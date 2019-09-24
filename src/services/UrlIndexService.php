@@ -78,7 +78,7 @@ class UrlIndexService extends DBActionService implements UrlServiceInterface
         return $urlForm;
     }
 
-    public function deleteUrl(string $url): void
+    public function removeUrl(string $url): void
     {
         throw new \Exception('Method not implement.');
     }

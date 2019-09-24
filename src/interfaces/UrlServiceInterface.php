@@ -17,7 +17,7 @@ interface UrlServiceInterface
 
     public function updateUrl(UrlUpdateForm $urlUpdateForm): UrlUpdateForm;
 
-    public function deleteUrl(string $url): void;
+    public function removeUrl(string $url): void;
 
     public function getUrlById(int $id): ?UrlUpdateForm;
 }
