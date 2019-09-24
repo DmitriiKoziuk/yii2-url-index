@@ -85,7 +85,11 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
 
     public function removeUrl(string $url): void
     {
-        throw new \Exception('Method not implement.');
+        $urlEntity = $this->urlRepository->getByUrl($url);
+        if (! empty($urlEntity)) {
+            $this->urlRepository->delete($urlEntity);
+        }
+        return;
     }
 
     public function getUrlById(int $id): ?UrlUpdateForm
