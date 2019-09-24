@@ -10,9 +10,9 @@ use DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_stubs\UrlRepositoryStub;
-use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
-class UrlServiceUpdateUrlMethodTest extends Unit
+class UrlIndexServiceUpdateUrlMethodTest extends Unit
 {
     /**
      * @var UnitTester
@@ -35,7 +35,7 @@ class UrlServiceUpdateUrlMethodTest extends Unit
      */
     public function testUpdateUrlMethodNotValidUrlUpdateForm(array $data)
     {
-        $service = new UrlService(
+        $service = new UrlIndexService(
             new UrlRepositoryStub($data),
             null
         );
@@ -52,7 +52,7 @@ class UrlServiceUpdateUrlMethodTest extends Unit
      */
     public function testUpdateUrlMethodNotFoundUpdatedEntity(array $data)
     {
-        $service = new UrlService(
+        $service = new UrlIndexService(
             new UrlRepositoryStub(),
             null
         );
@@ -70,7 +70,7 @@ class UrlServiceUpdateUrlMethodTest extends Unit
      */
     public function testUpdateUrlMethodWorkFine(array $data)
     {
-        $service = new UrlService(
+        $service = new UrlIndexService(
             new UrlRepositoryStub($data),
             null
         );

@@ -9,7 +9,7 @@ use yii\filters\VerbFilter;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntitySearch;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
-use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
 /**
  * FileController implements the CRUD actions for UrlIndexEntity model.
@@ -17,14 +17,14 @@ use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
 class UrlController extends Controller
 {
     /**
-     * @var UrlService
+     * @var UrlIndexService
      */
-    private $urlService;
+    private $urlIndexService;
 
-    public function __construct($id, $module, UrlService $urlService, $config = [])
+    public function __construct($id, $module, UrlIndexService $urlIndexService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->urlService = $urlService;
+        $this->urlIndexService = $urlIndexService;
     }
 
     /**
@@ -81,7 +81,7 @@ class UrlController extends Controller
         $createForm = new UrlCreateForm();
 
         if ($createForm->load(Yii::$app->request->post())) {
-            $form = $this->urlService->createUrl($createForm);
+            $form = $this->urlIndexService->createUrl($createForm);
             return $this->redirect(['view', 'id' => $form->id]);
         }
 
@@ -101,12 +101,12 @@ class UrlController extends Controller
      */
     public function actionUpdate(int $id)
     {
-        $urlUpdateForm = $this->urlService->getUrlById($id);
+        $urlUpdateForm = $this->urlIndexService->getUrlById($id);
         if (empty($urlUpdateForm)) {
             throw new NotFoundHttpException("Url with id '{$id}' not found.");
         }
         if ($urlUpdateForm->load(Yii::$app->request->post())) {
-            $urlUpdateForm = $this->urlService->updateUrl($urlUpdateForm);
+            $urlUpdateForm = $this->urlIndexService->updateUrl($urlUpdateForm);
             return $this->redirect(['view', 'id' => $urlUpdateForm->id]);
         }
         return $this->render('update', [

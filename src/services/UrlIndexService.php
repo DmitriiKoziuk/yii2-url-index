@@ -17,7 +17,7 @@ use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlServiceInterface;
 
-class UrlService extends DBActionService implements UrlServiceInterface
+class UrlIndexService extends DBActionService implements UrlServiceInterface
 {
     use ModelValidator;
 

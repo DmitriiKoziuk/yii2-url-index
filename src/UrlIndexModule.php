@@ -11,7 +11,7 @@ use yii\base\Application as BaseApp;
 use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
-use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
 class UrlIndexModule extends Module implements ModuleInterface
 {
@@ -111,10 +111,10 @@ class UrlIndexModule extends Module implements ModuleInterface
         /** @var UrlRepository $urlRepository */
         $urlRepository = $this->diContainer->get(UrlRepository::class);
 
-        $this->diContainer->setSingleton(UrlService::class, function () use (
+        $this->diContainer->setSingleton(UrlIndexService::class, function () use (
             $urlRepository
         ) {
-            return new UrlService(
+            return new UrlIndexService(
                 $urlRepository,
                 $this->dbConnection
             );

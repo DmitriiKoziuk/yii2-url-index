@@ -7,10 +7,10 @@ use yii\di\Container;
 use Codeception\Test\Unit;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_stubs\UrlRepositoryStub;
-use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 
-class UrlServiceGetUrlByIdMethodTest extends Unit
+class UrlIndexServiceGetUrlByIdMethodTest extends Unit
 {
     /**
      * @var UnitTester
@@ -32,7 +32,7 @@ class UrlServiceGetUrlByIdMethodTest extends Unit
      */
     public function testWithValidData($data): void
     {
-        $service = new UrlService(
+        $service = new UrlIndexService(
             new UrlRepositoryStub($data),
             null
         );
@@ -47,7 +47,7 @@ class UrlServiceGetUrlByIdMethodTest extends Unit
      */
     public function testWithNotValidData($data): void
     {
-        $service = new UrlService(
+        $service = new UrlIndexService(
             new UrlRepositoryStub(),
             null
         );

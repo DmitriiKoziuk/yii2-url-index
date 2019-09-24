@@ -12,9 +12,9 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_stubs\UrlRepositoryStub;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
-use DmitriiKoziuk\yii2UrlIndex\services\UrlService;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
-class UrlServiceCreateUrlMethodTest extends Unit
+class UrlIndexServiceCreateUrlMethodTest extends Unit
 {
     /**
      * @var UnitTester
@@ -39,7 +39,7 @@ class UrlServiceCreateUrlMethodTest extends Unit
      */
     public function testCreateMethodWithValidData(array $data)
     {
-        $service = new UrlService(
+        $service = new UrlIndexService(
             new UrlRepositoryStub($data),
             null
         );
@@ -62,7 +62,7 @@ class UrlServiceCreateUrlMethodTest extends Unit
 
     public function testCreateMethodThrowInvalidFormException()
     {
-        $service = new UrlService(
+        $service = new UrlIndexService(
             new UrlRepositoryStub(),
             null
         );
