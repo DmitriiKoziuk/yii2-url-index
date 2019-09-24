@@ -5,14 +5,18 @@ namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\url;
 use Yii;
 use yii\di\Container;
 use Codeception\Test\Unit;
+use PHPUnit\Framework\MockObject\MockObject;
 use DmitriiKoziuk\yii2Base\exceptions\DataNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyExistException;
 use DmitriiKoziuk\yii2Base\exceptions\InvalidFormException;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_stubs\UrlRepositoryStub;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
+use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
 
 class UrlIndexServiceAddUrlMethodTest extends Unit
 {
@@ -35,17 +39,23 @@ class UrlIndexServiceAddUrlMethodTest extends Unit
      * @throws DataNotValidException
      * @throws ExternalComponentException
      * @throws InvalidFormException
+     * @throws UrlAlreadyExistException
      * @dataProvider validUrlCreateFormDataProvider
      */
     public function testWithValidData(array $data): void
     {
+        /** @var MockObject|UrlRepository $urlRepository */
+        $urlRepository = $this->createMock(UrlRepository::class);
+        $urlRepository->method('getByUrl')->willReturn(null);
+        $urlRepository->method('save')->willReturn(new UrlEntity($data));
+
         $service = new UrlIndexService(
-            new UrlRepositoryStub($data),
+            $urlRepository,
             null
         );
+
         $createFormData = $data;
         unset($createFormData['id'], $createFormData['created_at'], $createFormData['updated_at']);
-
         $createForm = new UrlCreateForm($createFormData);
         $this->assertTrue($createForm->validate());
 
@@ -70,6 +80,28 @@ class UrlIndexServiceAddUrlMethodTest extends Unit
         $createForm = new UrlCreateForm();
         $this->assertFalse($createForm->validate());
         $this->expectException(InvalidFormException::class);
+        $service->addUrl($createForm);
+    }
+
+    /**
+     * @param array $data
+     * @throws DataNotValidException
+     * @throws ExternalComponentException
+     * @throws InvalidFormException
+     * @throws UrlAlreadyExistException
+     * @depends      testWithValidData
+     * @dataProvider validUrlCreateFormDataProvider
+     */
+    public function testThrowUrlAlreadyExistException(array $data): void
+    {
+        $service = new UrlIndexService(
+            new UrlRepositoryStub($data),
+            null
+        );
+        $createFormData = $data;
+        unset($createFormData['id'], $createFormData['created_at'], $createFormData['updated_at']);
+        $createForm = new UrlCreateForm($createFormData);
+        $this->expectException(UrlAlreadyExistException::class);
         $service->addUrl($createForm);
     }
 

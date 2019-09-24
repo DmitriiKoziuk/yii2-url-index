@@ -16,6 +16,7 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyExistException;
 
 class UrlIndexService extends DBActionService implements UrlIndexServiceInterface
 {
@@ -38,6 +39,7 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
      * @param UrlCreateForm $urlCreateForm
      * @throws DataNotValidException|InvalidFormException
      * @throws ExternalComponentException
+     * @throws UrlAlreadyExistException
      * @return UrlUpdateForm
      */
     public function addUrl(UrlCreateForm $urlCreateForm): UrlUpdateForm
@@ -46,6 +48,9 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
             [$urlCreateForm],
             new InvalidFormException('UrlCreateForm not valid.')
         );
+        if ($this->isUrlExist($urlCreateForm->url)) {
+            throw new UrlAlreadyExistException("Url '{$urlCreateForm->url}' already exist in index.");
+        }
         $urlEntity = new UrlEntity();
         $urlEntity->setAttributes($urlCreateForm->getAttributes());
         $urlEntity = $this->save($urlEntity);
