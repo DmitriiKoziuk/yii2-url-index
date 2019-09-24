@@ -92,6 +92,11 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         return new UrlUpdateForm($urlEntity->getAttributes());
     }
 
+    public function isUrlExist(string $url): bool
+    {
+        return !is_null($this->urlRepository->getByUrl($url));
+    }
+
     /**
      * @param UrlEntity $urlEntity
      * @return UrlEntity

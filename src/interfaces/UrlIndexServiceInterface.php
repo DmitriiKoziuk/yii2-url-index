@@ -20,4 +20,6 @@ interface UrlIndexServiceInterface
     public function removeUrl(string $url): void;
 
     public function getUrlById(int $id): ?UrlUpdateForm;
+
+    public function isUrlExist(string $url): bool;
 }
