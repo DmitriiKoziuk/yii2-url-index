@@ -6,7 +6,7 @@ use yii\db\Connection;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 
-interface UrlServiceInterface
+interface UrlIndexServiceInterface
 {
     public function __construct(
         UrlRepositoryInterface $urlRepository,

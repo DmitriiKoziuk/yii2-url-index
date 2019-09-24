@@ -15,9 +15,9 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
-use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlServiceInterface;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
 
-class UrlIndexService extends DBActionService implements UrlServiceInterface
+class UrlIndexService extends DBActionService implements UrlIndexServiceInterface
 {
     use ModelValidator;
 
