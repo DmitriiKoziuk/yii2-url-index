@@ -121,10 +121,13 @@ class UrlController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete(int $id)
     {
-        $this->findModel($id)->delete();
-
+        $url = $this->urlIndexService->getUrlById($id);
+        if (empty($url)) {
+            throw new NotFoundHttpException("Url with id '{$id}' not found.");
+        }
+        $this->urlIndexService->removeUrl($url['url']);
         return $this->redirect(['index']);
     }
 

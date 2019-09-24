@@ -4,7 +4,7 @@ namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
 
-class CreateUrlCest
+class CreateAndDeleteUrlCest
 {
     private $loggedInCookie;
     private $createdPageId;
