@@ -86,10 +86,63 @@ class MainPageCest
     }
 
     /**
+     * @param AcceptanceTester $I
+     * @depends tryOpenMainPage
+     */
+    public function checkIsUrlNumberEquivalentOfUrlsInDB(AcceptanceTester $I)
+    {
+        $I->wantTo('Check is url number equivalent of urls in DB.');
+        $I->amOnPage('/dk-url-index/url/index');
+        $I->seeResponseCodeIs(200);
+
+        $I->see('Showing 1-3 of 3 items.');
+    }
+
+    /**
+     * @param AcceptanceTester $I
+     * @param Example $url
+     * @depends tryOpenMainPage
+     * @dataProvider oneUrlDataProvider
+     */
+    public function trySearchById(AcceptanceTester $I, Example $url)
+    {
+        $I->wantTo('try search by id field.');
+        $I->amOnPage("/dk-url-index/url/index?UrlSearchForm[id]={$url['id']}");
+        $I->seeResponseCodeIs(200);
+
+        $I->see('Showing 1-1 of 1 item.');
+        $I->see($url['url']);
+    }
+
+    /**
+     * @param AcceptanceTester $I
+     * @param Example $url
+     * @depends tryOpenMainPage
+     * @dataProvider oneUrlDataProvider
+     */
+    public function trySearchUrlUrl(AcceptanceTester $I, Example $url)
+    {
+        $I->wantTo('try search by url field.');
+        $I->amOnPage("/dk-url-index/url/index?UrlSearchForm[url]={$url['url']}");
+        $I->seeResponseCodeIs(200);
+
+        $I->see('Showing 1-1 of 1 item.');
+        $I->see($url['url']);
+    }
+
+    /**
      * @return array
      */
     protected function urlDataProvider()
     {
         return include codecept_data_dir() . 'url_data.php';
+    }
+
+    protected function oneUrlDataProvider(): array
+    {
+        $array = include codecept_data_dir() . 'url_data.php';
+        return [
+            array_shift($array),
+        ];
     }
 }
