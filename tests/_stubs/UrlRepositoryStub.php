@@ -2,10 +2,12 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests\_stubs;
 
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 
 class UrlRepositoryStub implements UrlRepositoryInterface
 {
@@ -33,5 +35,10 @@ class UrlRepositoryStub implements UrlRepositoryInterface
 
     public function delete(ActiveRecord $activeRecord): void
     {
+    }
+
+    public function urlSearchQueryBuilder(UrlSearchForm $form): ActiveQuery
+    {
+        return UrlEntity::find();
     }
 }
