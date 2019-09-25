@@ -6,8 +6,8 @@ use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntitySearch;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
 /**
@@ -47,11 +47,12 @@ class UrlController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new UrlEntitySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $urlSearchForm = new UrlSearchForm();
+        $urlSearchForm->load(Yii::$app->request->queryParams);
+        $dataProvider = $this->urlIndexService->search($urlSearchForm);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel' => $urlSearchForm,
             'dataProvider' => $dataProvider,
         ]);
     }
