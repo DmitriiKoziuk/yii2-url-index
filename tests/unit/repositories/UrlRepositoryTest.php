@@ -3,6 +3,7 @@
 namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\repositories;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\di\Container;
 use Codeception\Test\Unit;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
@@ -10,6 +11,7 @@ use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 
 class UrlRepositoryTest extends Unit
 {
@@ -78,8 +80,47 @@ class UrlRepositoryTest extends Unit
         $this->assertNull($urlRepository->getByUrl('/some-fake-url.html'));
     }
 
+    /**
+     * @param array $data
+     * @dataProvider existUrlsDataProvider
+     */
+    public function testMethodUrlSearchQueryBuilder(array $data): void
+    {
+        /** @var UrlRepositoryInterface $urlRepository */
+        $urlRepository = new UrlRepository();
+        $urlSearchForm = new UrlSearchForm($data);
+        $query = $urlRepository->urlSearchQueryBuilder($urlSearchForm);
+        $this->assertInstanceOf(
+            ActiveQuery::class,
+            $query
+        );
+        /** @var UrlEntity[] $urlEntities */
+        $urlEntities = $query
+            ->indexBy('id')
+            ->all();
+        $this->assertNotEmpty($urlEntities);
+        $this->assertEquals(1, count($urlEntities));
+        $this->assertArrayHasKey($data['id'], $urlEntities);
+        $this->assertInstanceOf(
+            UrlEntity::class,
+            $urlEntities[ $data['id'] ]
+        );
+        $this->assertEquals($urlEntities[ $data['id'] ]->getAttributes(), $data);
+    }
+
     public function existUrlDataProvider()
     {
         return include codecept_data_dir() . 'url_data.php';
+    }
+
+    public function existUrlsDataProvider()
+    {
+        $fixtures = include codecept_data_dir() . 'url_data.php';
+        $fixtures = array_map(function ($array) {
+            $list = [];
+            array_push($list, $array);
+            return $list;
+        }, $fixtures);
+        return $fixtures;
     }
 }
