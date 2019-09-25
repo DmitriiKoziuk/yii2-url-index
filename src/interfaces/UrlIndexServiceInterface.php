@@ -3,8 +3,10 @@
 namespace DmitriiKoziuk\yii2UrlIndex\interfaces;
 
 use yii\db\Connection;
+use yii\data\ActiveDataProvider;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 
 interface UrlIndexServiceInterface
 {
@@ -22,4 +24,6 @@ interface UrlIndexServiceInterface
     public function getUrlById(int $id): ?UrlUpdateForm;
 
     public function isUrlExist(string $url): bool;
+
+    public function search(UrlSearchForm $urlSearchForm): ActiveDataProvider;
 }
