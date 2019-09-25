@@ -3,6 +3,7 @@
 namespace DmitriiKoziuk\yii2UrlIndex\services;
 
 use yii\db\Connection;
+use yii\data\ActiveDataProvider;
 use DmitriiKoziuk\yii2Base\services\DBActionService;
 use DmitriiKoziuk\yii2Base\traits\ModelValidator;
 use DmitriiKoziuk\yii2Base\exceptions\DataNotValidException;
@@ -13,6 +14,7 @@ use DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException;
 use DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
@@ -104,6 +106,13 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
     public function isUrlExist(string $url): bool
     {
         return !is_null($this->urlRepository->getByUrl($url));
+    }
+
+    public function search(UrlSearchForm $urlSearchForm): ActiveDataProvider
+    {
+        return new ActiveDataProvider([
+            'query' => $this->urlRepository->urlSearchQueryBuilder($urlSearchForm),
+        ]);
     }
 
     /**
