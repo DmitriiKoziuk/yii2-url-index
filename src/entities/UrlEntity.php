@@ -3,6 +3,7 @@
 namespace DmitriiKoziuk\yii2UrlIndex\entities;
 
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use DmitriiKoziuk\yii2Base\BaseModule;
@@ -12,7 +13,7 @@ use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
  * This is the model class for table "{{%dk_url_index_urls}}".
  *
  * @property int    $id
- * @property string $url
+ * @property int    $url
  * @property string $redirect_to_url
  * @property string $module_name
  * @property string $controller_name
@@ -49,7 +50,7 @@ class UrlEntity extends ActiveRecord
                 'required'
             ],
             [
-                ['url', 'redirect_to_url'],
+                ['url'],
                 'string',
                 'max' => 255
             ],
@@ -63,13 +64,20 @@ class UrlEntity extends ActiveRecord
                 'max' => 45
             ],
             [
-                ['module_name', 'redirect_to_url'],
+                ['redirect_to_url', 'module_name'],
                 'default',
                 'value' => null
             ],
             [
-                ['created_at', 'updated_at'],
+                ['redirect_to_url', 'created_at', 'updated_at'],
                 'integer'
+            ],
+            [
+                ['redirect_to_url'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => UrlEntity::class,
+                'targetAttribute' => ['redirect_to_url' => 'id']
             ],
         ];
     }
@@ -90,5 +98,13 @@ class UrlEntity extends ActiveRecord
             'created_at' => Yii::t(BaseModule::TRANSLATE, 'Created At'),
             'updated_at' => Yii::t(BaseModule::TRANSLATE, 'Updated At'),
         ];
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getRedirectUrl()
+    {
+        return $this->hasOne(UrlEntity::class, ['id' => 'redirect_to_url']);
     }
 }

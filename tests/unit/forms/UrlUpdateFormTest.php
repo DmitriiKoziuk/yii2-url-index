@@ -4,6 +4,7 @@ namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\forms;
 
 use Yii;
 use yii\di\Container;
+use Faker\Provider\Base;
 use Codeception\Test\Unit;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
@@ -15,21 +16,6 @@ class UrlUpdateFormTest extends Unit
      */
     protected $tester;
 
-    /**
-     * @var UrlUpdateForm
-     */
-    protected $form;
-
-    public static function setUpBeforeClass(): void
-    {
-
-    }
-    
-    protected function _before()
-    {
-        $this->form = new UrlUpdateForm();
-    }
-
     protected function _after()
     {
         Yii::$container = new Container();
@@ -37,55 +23,29 @@ class UrlUpdateFormTest extends Unit
 
     /**
      * @param array $attributes
-     * @dataProvider validUrlEntityDataProvider
+     * @dataProvider validDataProvider
      */
-    public function testEntityValidateTrue(array $attributes)
+    public function testValid(array $attributes)
     {
-        $this->form->setAttributes($attributes);
-        $this->assertTrue($this->form->validate());
+        $form = new UrlUpdateForm($attributes);
+        $this->assertTrue($form->validate());
     }
 
     /**
-     * @param string $url
-     * @param string $expectErrorMessage
-     * @dataProvider notValidUrlDataProvider
+     * @param string $attributeName
+     * @param mixed $attributeValue
+     * @param string $attributeErrorMessage
+     * @dataProvider notValidDataProvider
      */
-    public function testUrlNotValid(string $url, string $expectErrorMessage)
+    public function testNotValid(string $attributeName, $attributeValue, string $attributeErrorMessage)
     {
-        $this->form->url = $url;
-        $this->assertFalse($this->form->validate());
-        $this->assertTrue($this->form->hasErrors('url'));
-        $this->assertContains($expectErrorMessage, $this->form->getErrors('url'));
+        $form = new UrlUpdateForm([$attributeName => $attributeValue]);
+        $this->assertFalse($form->validate());
+        $this->assertTrue($form->hasErrors($attributeName));
+        $this->assertContains($attributeErrorMessage, $form->getErrors()[ $attributeName ]);
     }
 
-    /**
-     * @param string $redirectToUrl
-     * @param string $expectErrorMessage
-     * @dataProvider notValidRedirectTUrlDataProvider
-     */
-    public function testRedirectToUrlNotValid(string $redirectToUrl, string $expectErrorMessage)
-    {
-        $this->form->redirect_to_url = $redirectToUrl;
-        $this->assertFalse($this->form->validate());
-        $this->assertTrue($this->form->hasErrors('redirect_to_url'));
-        $this->assertContains($expectErrorMessage, $this->form->getErrors('redirect_to_url'));
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $value
-     * @param string $expectErrorMessage
-     * @dataProvider notValidFieldsDataProvider
-     */
-    public function testFieldNotValid(string $fieldName, string $value, string $expectErrorMessage)
-    {
-        $this->form->$fieldName = $value;
-        $this->assertFalse($this->form->validate());
-        $this->assertTrue($this->form->hasErrors($fieldName));
-        $this->assertContains($expectErrorMessage, $this->form->getErrors($fieldName));
-    }
-
-    public function validUrlEntityDataProvider()
+    public function validDataProvider()
     {
         $fixtures = include codecept_data_dir() . 'url_data.php';
         $fixtures = array_map(function ($array) {
@@ -97,67 +57,218 @@ class UrlUpdateFormTest extends Unit
         return $fixtures;
     }
 
-    public function notValidUrlDataProvider()
+    public function notValidDataProvider()
     {
         return [
-            'Url > cannot be blank.' => [
+            'id blank' => [
+                'id',
                 '',
-                'Url cannot be blank.'
+                'Id cannot be blank.',
             ],
-            'Url > contain more then 255 characters' => [
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Url should contain at most 255 characters.'
+            'url blank' => [
+                'url',
+                '',
+                'Url cannot be blank.',
             ],
-        ];
-    }
-
-    public function notValidRedirectTUrlDataProvider()
-    {
-        return [
-            'Redirect To Url > contain more then 255 characters' => [
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Redirect To Url should contain at most 255 characters.'
+            'url not start from "/"' => [
+                'url',
+                'not-valid-url.html',
+                'Url must start from "/" character.',
             ],
-        ];
-    }
-
-    public function notValidFieldsDataProvider()
-    {
-        return [
-            'Module Name > contain more then 45 characters' => [
+            'url end by space' => [
+                'url',
+                '/not-valid-url.html ',
+                'Url cant end by space.',
+            ],
+            'url max length 255' => [
+                'url',
+                '/' . Base::lexify(str_repeat('?', 255)),
+                'Url should contain at most 255 characters.',
+            ],
+            'module_name max length 45' => [
                 'module_name',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Module Name should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 46)),
+                'Module Name should contain at most 45 characters.',
             ],
-            'Controller Name > cannot be blank.' => [
+            'module_name contain space between words' => [
+                'module_name',
+                'some name',
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'module_name contain \n between words' => [
+                'module_name',
+                "some\nname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'module_name contain \t between words' => [
+                'module_name',
+                "some\tname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'module_name contain space at start' => [
+                'module_name',
+                " some_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'module_name contain \n at start' => [
+                'module_name',
+                "\nsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'module_name contain \t at start' => [
+                'module_name',
+                "\tsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'module_name contain space at end' => [
+                'module_name',
+                "some_name ",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'module_name contain \t at end' => [
+                'module_name',
+                "some_name\t",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name blank' => [
                 'controller_name',
                 '',
-                'Controller Name cannot be blank.'
+                'Controller Name cannot be blank.',
             ],
-            'Controller Name > contain more then 45 characters' => [
+            'controller_name max length 45' => [
                 'controller_name',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Controller Name should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 255)),
+                'Controller Name should contain at most 45 characters.',
             ],
-            'Action Name > cannot be blank.' => [
+            'controller_name contain space between words' => [
+                'controller_name',
+                'some name',
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name contain \n between words' => [
+                'controller_name',
+                "some\nname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name contain \t between words' => [
+                'controller_name',
+                "some\tname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name contain space at start' => [
+                'module_name',
+                " some_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name contain \n at start' => [
+                'module_name',
+                "\nsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name contain \t at start' => [
+                'module_name',
+                "\tsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name contain space at end' => [
+                'module_name',
+                "some_name ",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'controller_name contain \t at end' => [
+                'module_name',
+                "some_name\t",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'action_name blank' => [
                 'action_name',
                 '',
-                'Action Name cannot be blank.'
+                'Action Name cannot be blank.',
             ],
-            'Action Name > contain more then 45 characters' => [
+            'action_name max length 45' => [
                 'action_name',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Action Name should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 255)),
+                'Action Name should contain at most 45 characters.',
             ],
-            'Entity ID > cannot be blank.' => [
+            'action_name contain \n between words' => [
+                'action_name',
+                "some\nname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'action_name contain \t between words' => [
+                'action_name',
+                "some\tname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'action_name contain space at start' => [
+                'action_name',
+                " some_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'action_name contain \n at start' => [
+                'action_name',
+                "\nsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'action_name contain \t at start' => [
+                'action_name',
+                "\tsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'action_name contain space at end' => [
+                'action_name',
+                "some_name ",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'action_name contain \t at end' => [
+                'action_name',
+                "some_name\t",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'entity_id blank' => [
                 'entity_id',
                 '',
-                'Entity Id cannot be blank.'
+                'Entity Id cannot be blank.',
             ],
-            'Entity ID > contain more then 45 characters' => [
+            'entity_id max length 45' => [
                 'entity_id',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Entity Id should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 255)),
+                'Entity Id should contain at most 45 characters.',
+            ],
+            'entity_id contain \n between words' => [
+                'entity_id',
+                "some\nname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'entity_id contain \t between words' => [
+                'entity_id',
+                "some\tname",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'entity_id contain space at start' => [
+                'entity_id',
+                " some_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'entity_id contain \n at start' => [
+                'entity_id',
+                "\nsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'entity_id contain \t at start' => [
+                'entity_id',
+                "\tsome_name",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'entity_id contain space at end' => [
+                'entity_id',
+                "some_name ",
+                'Attribute must contain only: characters, digits and underscores.',
+            ],
+            'entity_id contain \t at end' => [
+                'entity_id',
+                "some_name\t",
+                'Attribute must contain only: characters, digits and underscores.',
             ],
         ];
     }

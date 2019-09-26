@@ -25,7 +25,7 @@ return [
     'url3' => [
         'id' => 3,
         'url' => '/some-url-3.html',
-        'redirect_to_url' => '/some-other-url.html',
+        'redirect_to_url' => 1,
         'module_name' => 'module',
         'controller_name' => 'controller',
         'action_name' => 'action',

@@ -5,6 +5,8 @@ namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\entities;
 use Yii;
 use yii\di\Container;
 use Codeception\Test\Unit;
+use Faker\Provider\Base;
+use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 
@@ -15,13 +17,14 @@ class UrlEntityTest extends Unit
      */
     protected $tester;
 
-    public static function setUpBeforeClass(): void
+    public function _fixtures()
     {
-
-    }
-    
-    protected function _before()
-    {
+        return [
+            'url' => [
+                'class' => UrlsFixture::class,
+                'dataFile' => codecept_data_dir() . 'url_data.php'
+            ]
+        ];
     }
 
     protected function _after()
@@ -31,131 +34,128 @@ class UrlEntityTest extends Unit
 
     /**
      * @param array $attributes
-     * @dataProvider validUrlEntityDataProvider
+     * @dataProvider validDataProvider
      */
-    public function testEntityValidateTrue(array $attributes)
+    public function testValid(array $attributes)
     {
         $urlEntity = new UrlEntity();
         $urlEntity->setAttributes($attributes);
-        $this->assertTrue($urlEntity->validate());
+        $v = $urlEntity->validate();
+        $this->assertTrue($v);
     }
 
     /**
-     * @param string $url
-     * @param string $expectErrorMessage
-     * @dataProvider notValidUrlDataProvider
+     * @param string $attributeName
+     * @param mixed $attributeValue
+     * @param string $attributeErrorMessage
+     * @dataProvider notValidDataProvider
      */
-    public function testUrlNotValid(string $url, string $expectErrorMessage)
+    public function testNotValid(string $attributeName, $attributeValue, string $attributeErrorMessage)
     {
         $urlEntity = new UrlEntity();
-        $urlEntity->setAttribute('url', $url);
-        $this->assertFalse($urlEntity->validate());
-        $this->assertTrue($urlEntity->hasErrors('url'));
-        $this->assertContains($expectErrorMessage, $urlEntity->getErrors('url'));
+        $urlEntity->setAttribute($attributeName, $attributeValue);
+        $v = $urlEntity->validate();
+        $this->assertFalse($v);
+        $this->assertTrue($urlEntity->hasErrors($attributeName));
+        $this->assertContains($attributeErrorMessage, $urlEntity->getErrors()[ $attributeName ]);
     }
 
-    /**
-     * @param string $redirectToUrl
-     * @param string $expectErrorMessage
-     * @dataProvider notValidRedirectTUrlDataProvider
-     */
-    public function testRedirectToUrlNotValid(string $redirectToUrl, string $expectErrorMessage)
-    {
-        $urlEntity = new UrlEntity();
-        $urlEntity->setAttribute('redirect_to_url', $redirectToUrl);
-        $this->assertFalse($urlEntity->validate());
-        $this->assertTrue($urlEntity->hasErrors('redirect_to_url'));
-        $this->assertContains($expectErrorMessage, $urlEntity->getErrors('redirect_to_url'));
-    }
-
-    /**
-     * @param string $fieldName
-     * @param string $value
-     * @param string $expectErrorMessage
-     * @dataProvider notValidFieldsDataProvider
-     */
-    public function testFieldNotValid(string $fieldName, string $value, string $expectErrorMessage)
-    {
-        $urlEntity = new UrlEntity();
-        $urlEntity->setAttribute($fieldName, $value);
-        $this->assertFalse($urlEntity->validate());
-        $this->assertTrue($urlEntity->hasErrors($fieldName));
-        $this->assertContains($expectErrorMessage, $urlEntity->getErrors($fieldName));
-    }
-
-    public function validUrlEntityDataProvider()
-    {
-        $fixtures = include codecept_data_dir() . 'url_data.php';
-        $fixtures = array_map(function ($array) {
-            $list = [];
-            unset($array['created_at'], $array['updated_at']);
-            array_push($list, $array);
-            return $list;
-        }, $fixtures);
-        return $fixtures;
-    }
-
-    public function notValidUrlDataProvider()
+    public function validDataProvider()
     {
         return [
-            'Url > cannot be blank.' => [
+            [
+                [
+                    'url' => '/some-valid-url.html',
+                    'redirect_to_url' => null,
+                    'module_name' => null,
+                    'controller_name' => 'c',
+                    'action_name' => 'a',
+                    'entity_id' => '1',
+                ],
+            ],
+            [
+                [
+                    'url' => '/some-valid-url.html',
+                    'redirect_to_url' => null,
+                    'module_name' => 'module_name',
+                    'controller_name' => 'controller_name',
+                    'action_name' => 'action_name',
+                    'entity_id' => 'entity_id',
+                ],
+            ],
+            [
+                [
+                    'url' => '/redirect-some-url.html',
+                    'redirect_to_url' => 1,
+                    'module_name' => 'module_name',
+                    'controller_name' => 'controller_name',
+                    'action_name' => 'action_name',
+                    'entity_id' => 'entity_id',
+                ],
+            ]
+        ];
+    }
+
+    public function notValidDataProvider()
+    {
+        /** @var array $fixtures */
+        $fixtures = require codecept_data_dir() . 'url_data.php';
+        $fixtureNumber = count($fixtures);
+        return [
+            'url blank' => [
+                'url',
                 '',
-                'Url cannot be blank.'
+                'Url cannot be blank.',
             ],
-            'Url > contain more then 255 characters' => [
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Url should contain at most 255 characters.'
+            'url duplicate' => [
+                'url',
+                '/some-url.html',
+                'Url "/some-url.html" has already been taken.',
             ],
-        ];
-    }
-
-    public function notValidRedirectTUrlDataProvider()
-    {
-        return [
-            'Redirect To Url > contain more then 255 characters' => [
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Redirect To Url should contain at most 255 characters.'
+            'url max length 255' => [
+                'url',
+                '/' . Base::lexify(str_repeat('?', 255)),
+                'Url should contain at most 255 characters.',
             ],
-        ];
-    }
-
-    public function notValidFieldsDataProvider()
-    {
-        return [
-            'Module Name > contain more then 45 characters' => [
+            'redirect_to_url link to non exist url id' => [
+                'redirect_to_url',
+                $fixtureNumber + 1,
+                'Redirect To Url is invalid.'
+            ],
+            'module_name max length 45' => [
                 'module_name',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Module Name should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 46)),
+                'Module Name should contain at most 45 characters.',
             ],
-            'Controller Name > cannot be blank.' => [
+            'controller_name blank' => [
                 'controller_name',
                 '',
-                'Controller Name cannot be blank.'
+                'Controller Name cannot be blank.',
             ],
-            'Controller Name > contain more then 45 characters' => [
+            'controller_name max length 45' => [
                 'controller_name',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Controller Name should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 255)),
+                'Controller Name should contain at most 45 characters.',
             ],
-            'Action Name > cannot be blank.' => [
+            'action_name blank' => [
                 'action_name',
                 '',
-                'Action Name cannot be blank.'
+                'Action Name cannot be blank.',
             ],
-            'Action Name > contain more then 45 characters' => [
+            'action_name max length 45' => [
                 'action_name',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Action Name should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 255)),
+                'Action Name should contain at most 45 characters.',
             ],
-            'Entity ID > cannot be blank.' => [
+            'entity_id blank' => [
                 'entity_id',
                 '',
-                'Entity ID cannot be blank.'
+                'Entity ID cannot be blank.',
             ],
-            'Entity ID > contain more then 45 characters' => [
+            'entity_id max length 45' => [
                 'entity_id',
-                '/some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url-some-long-url.html',
-                'Entity ID should contain at most 45 characters.'
+                Base::lexify(str_repeat('?', 255)),
+                'Entity ID should contain at most 45 characters.',
             ],
         ];
     }

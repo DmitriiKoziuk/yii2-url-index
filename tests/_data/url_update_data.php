@@ -25,7 +25,7 @@ return [
     'url3' => [
         'id' => 3,
         'url' => '/feedback.php',
-        'redirect_to_url' => '/feedback',
+        'redirect_to_url' => 2,
         'module_name' => NULL,
         'controller_name' => 'feedback',
         'action_name' => 'index',

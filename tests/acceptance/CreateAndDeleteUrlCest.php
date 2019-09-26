@@ -59,7 +59,7 @@ class CreateAndDeleteUrlCest
         $I->seeResponseCodeIs(200);
         $I->see('Create Url', 'h1');
         $I->fillField('UrlCreateForm[url]', '/some-url.html');
-        $I->fillField('UrlCreateForm[redirect_to_url]', '/to-new-url.html');
+        $I->fillField('UrlCreateForm[redirect_to_url]', '');
         $I->fillField('UrlCreateForm[module_name]', 'module');
         $I->fillField('UrlCreateForm[controller_name]', 'controller');
         $I->fillField('UrlCreateForm[action_name]', 'action');
