@@ -11,14 +11,15 @@ use DmitriiKoziuk\yii2Base\exceptions\InvalidFormException;
 use DmitriiKoziuk\yii2Base\exceptions\EntityNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\EntitySaveException;
 use DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException;
-use DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException;
+use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
-use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyExistException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException;
 
 class UrlIndexService extends DBActionService implements UrlIndexServiceInterface
 {
@@ -39,10 +40,10 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
 
     /**
      * @param UrlCreateForm $urlCreateForm
-     * @throws DataNotValidException|InvalidFormException
-     * @throws ExternalComponentException
-     * @throws UrlAlreadyExistException
      * @return UrlUpdateForm
+     *@throws ExternalComponentException
+     * @throws UrlAlreadyHasBeenTakenException
+     * @throws DataNotValidException|InvalidFormException
      */
     public function addUrl(UrlCreateForm $urlCreateForm): UrlUpdateForm
     {
@@ -51,7 +52,7 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
             new InvalidFormException('UrlCreateForm not valid.')
         );
         if ($this->isUrlExist($urlCreateForm->url)) {
-            throw new UrlAlreadyExistException("Url '{$urlCreateForm->url}' already exist in index.");
+            throw new UrlAlreadyHasBeenTakenException("Url '{$urlCreateForm->url}' already exist in index.");
         }
         $urlEntity = new UrlEntity();
         $urlEntity->setAttributes($urlCreateForm->getAttributes());
@@ -64,8 +65,9 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
      * @param UrlUpdateForm $urlUpdateForm
      * @return UrlUpdateForm
      * @throws DataNotValidException|InvalidFormException
-     * @throws EntityNotFoundException
      * @throws ExternalComponentException
+     * @throws UrlAlreadyHasBeenTakenException
+     * @throws UrlNotFoundException
      */
     public function updateUrl(UrlUpdateForm $urlUpdateForm): UrlUpdateForm
     {
@@ -74,15 +76,37 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
             new InvalidFormException('UrlUpdateForm not valid.')
         );
 
-        $urlEntity = $this->urlRepository->getById($urlUpdateForm->id);
-        if (empty($urlEntity)) {
-            throw new EntityNotFoundException("UrlEntity with id '{$urlUpdateForm->id}' not found.");
+        $updatedUrl = $this->urlRepository->getById($urlUpdateForm->id);
+        if (is_null($updatedUrl)) {
+            throw new UrlNotFoundException("Url with id '{$urlUpdateForm->id}' not found.");
         }
-        $urlEntity->setAttributes($urlUpdateForm->getAttributes());
-        $urlEntity = $this->save($urlEntity);
-        $urlForm = new UrlUpdateForm($urlEntity->getAttributes());
 
-        return $urlForm;
+        $existUrl = $this->urlRepository->getByUrl($urlUpdateForm->url);
+        if (! is_null($existUrl) && ! $existUrl->isRedirect()) {
+            throw new UrlAlreadyHasBeenTakenException("Url '{$urlUpdateForm->url}' already exist in index.");
+        }
+
+        try {
+            $this->beginTransaction();
+            if (! is_null($existUrl)) {
+                $this->urlRepository->delete($existUrl);
+            }
+            $oldUrl = $updatedUrl->url;
+            $updatedAttributes = $urlUpdateForm->getAttributes();
+            unset($updatedAttributes['id'], $updatedAttributes['created_at'], $updatedAttributes['updated_at']);
+            $updatedUrl->setAttributes($updatedAttributes);
+            $isUrlChanged = $updatedUrl->isAttributeChanged('url');
+            $updatedUrl = $this->save($updatedUrl);
+            $urlForm = new UrlUpdateForm($updatedUrl->getAttributes());
+            if ($isUrlChanged) {
+                $this->createRedirectUrl($oldUrl, $updatedUrl->id);
+            }
+            $this->commitTransaction();
+            return $urlForm;
+        } catch (ExternalComponentException $e) {
+            $this->rollbackTransaction();
+            throw $e;
+        }
     }
 
     public function removeUrl(string $url): void
@@ -113,6 +137,24 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         return new ActiveDataProvider([
             'query' => $this->urlRepository->urlSearchQueryBuilder($urlSearchForm),
         ]);
+    }
+
+    /**
+     * @param string $url
+     * @param int $redirectToUrlId
+     * @throws ExternalComponentException
+     */
+    private function createRedirectUrl(string $url, int $redirectToUrlId)
+    {
+        $redirectUrlEntity = new UrlEntity([
+            'url' => $url,
+            'redirect_to_url' => $redirectToUrlId,
+            'module_name' => UrlIndexModule::getId(),
+            'controller_name' => 'url',
+            'action_name' => 'redirect',
+            'entity_id' => '302',
+        ]);
+        $this->save($redirectUrlEntity);
     }
 
     /**
