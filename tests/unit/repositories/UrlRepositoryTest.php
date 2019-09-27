@@ -29,10 +29,6 @@ class UrlRepositoryTest extends Unit
             ]
         ];
     }
-    
-    protected function _before()
-    {
-    }
 
     protected function _after()
     {
@@ -78,6 +74,15 @@ class UrlRepositoryTest extends Unit
         /** @var UrlRepositoryInterface $urlRepository */
         $urlRepository = new UrlRepository();
         $this->assertNull($urlRepository->getByUrl('/some-fake-url.html'));
+    }
+
+    public function testMethodGetRedirects()
+    {
+        /** @var UrlRepositoryInterface $urlRepository */
+        $urlRepository = new UrlRepository();
+        $redirects = $urlRepository->getRedirects(1);
+        $this->assertIsArray($redirects);
+        $this->assertEquals(1, count($redirects));
     }
 
     /**

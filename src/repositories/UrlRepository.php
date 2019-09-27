@@ -24,6 +24,12 @@ class UrlRepository extends AbstractActiveRecordRepository implements UrlReposit
         return $entity;
     }
 
+    public function getRedirects(int $urlId): array
+    {
+        $entities = UrlEntity::find()->where(['redirect_to_url' => $urlId])->all();
+        return $entities;
+    }
+
     /**
      * @param UrlSearchForm $form
      * @return ActiveQuery
