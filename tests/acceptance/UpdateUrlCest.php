@@ -37,29 +37,23 @@ class UpdateUrlCest
 
     /**
      * @param AcceptanceTester $I
-     * @param Example $existUrls
-     * @param Example $dataForUpdate
+     * @param Example $data
      * @depends trySignIn
-     * @dataProvider urlDataProvider
      * @dataProvider urlUpdateDataProvider
      */
-    public function tryUpdateValue(AcceptanceTester $I, Example $existUrls, Example $dataForUpdate)
+    public function tryUpdateValue(AcceptanceTester $I, Example $data)
     {
-        $I->amOnPage("/dk-url-index/url/update?id={$existUrls['id']}");
-        $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
-
-        $I->fillField(['name' => "UrlUpdateForm[url]"], $dataForUpdate['url']);
-        $value = $dataForUpdate['redirect_to_url'] ?? '';
-        $I->fillField(['name' => 'UrlUpdateForm[redirect_to_url]'], $value);
-        $value = $dataForUpdate['module_name'] ?? '';
-        $I->fillField(['name' => 'UrlUpdateForm[module_name]'], $value);
-        $I->fillField(['name' => 'UrlUpdateForm[controller_name]'], $dataForUpdate['controller_name']);
-        $I->fillField(['name' => 'UrlUpdateForm[action_name]'], $dataForUpdate['action_name']);
-        $I->fillField(['name' => 'UrlUpdateForm[action_name]'], $dataForUpdate['action_name']);
+        $I->amOnPage("/dk-url-index/url/update?id={$data['id']}");
+        $I->see("Update Url Index Entity: {$data['id']}", 'h1');
+        foreach ($data['fields'] as $name => $value) {
+            $I->fillField(['name' => $name], $value);
+        }
         $I->click('#save-url');
 
         $I->seeResponseCodeIs(200);
-        $I->see("Url created: {$dataForUpdate['url']}", 'h1');
+        foreach ($data['fields'] as $name => $value) {
+            $I->see($value);
+        }
         $I->seeElement('#delete-url');
         $I->click('#delete-url');
 
@@ -71,16 +65,25 @@ class UpdateUrlCest
     /**
      * @return array
      */
-    protected function urlDataProvider()
-    {
-        return include codecept_data_dir() . 'url_data.php';
-    }
-
-    /**
-     * @return array
-     */
     protected function urlUpdateDataProvider()
     {
-        return include codecept_data_dir() . 'url_update_data.php';
+        return [
+            [
+                'id' => 1,
+                'fields' => [
+                    'UrlUpdateForm[url]' => '/some-update-url-1.html'
+                ]
+            ],
+            [
+                'id' => 1,
+                'fields' => [
+                    'UrlUpdateForm[url]' => '/some-second-update-url-1.html',
+                    'UrlUpdateForm[module_name]' => 'some-module-name',
+                    'UrlUpdateForm[controller_name]' => 'some-controller-name',
+                    'UrlUpdateForm[action_name]' => 'some-action-name',
+                    'UrlUpdateForm[entity_id]' => 'some-entity-id',
+                ]
+            ],
+        ];
     }
 }
