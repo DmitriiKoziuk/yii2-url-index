@@ -8,7 +8,7 @@ use Codeception\Test\Unit;
 use PHPUnit\Framework\MockObject\MockObject;
 use DmitriiKoziuk\yii2Base\exceptions\DataNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException;
-use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyExistException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException;
 use DmitriiKoziuk\yii2Base\exceptions\InvalidFormException;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
@@ -39,7 +39,7 @@ class UrlIndexServiceAddUrlMethodTest extends Unit
      * @throws DataNotValidException
      * @throws ExternalComponentException
      * @throws InvalidFormException
-     * @throws UrlAlreadyExistException
+     * @throws UrlAlreadyHasBeenTakenException
      * @dataProvider validUrlCreateFormDataProvider
      */
     public function testWithValidData(array $data): void
@@ -88,7 +88,7 @@ class UrlIndexServiceAddUrlMethodTest extends Unit
      * @throws DataNotValidException
      * @throws ExternalComponentException
      * @throws InvalidFormException
-     * @throws UrlAlreadyExistException
+     * @throws UrlAlreadyHasBeenTakenException
      * @depends      testWithValidData
      * @dataProvider validUrlCreateFormDataProvider
      */
@@ -101,7 +101,7 @@ class UrlIndexServiceAddUrlMethodTest extends Unit
         $createFormData = $data;
         unset($createFormData['id'], $createFormData['created_at'], $createFormData['updated_at']);
         $createForm = new UrlCreateForm($createFormData);
-        $this->expectException(UrlAlreadyExistException::class);
+        $this->expectException(UrlAlreadyHasBeenTakenException::class);
         $service->addUrl($createForm);
     }
 
