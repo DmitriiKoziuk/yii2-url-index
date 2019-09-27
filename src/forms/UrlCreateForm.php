@@ -43,8 +43,8 @@ class UrlCreateForm extends Model
             [
                 ['module_name', 'controller_name', 'action_name', 'entity_id'],
                 function ($attribute, $params, $validators) {
-                    if (0 === preg_match('/^[a-zA-Z0-9_]*$/', $this->$attribute, $matches)) {
-                        $this->addError($attribute, 'Attribute must contain only: characters, digits and underscores.');
+                    if (0 === preg_match('/^[a-zA-Z0-9_-]*$/', $this->$attribute, $matches)) {
+                        $this->addError($attribute, 'Attribute must contain only: characters, digits, underscores and hyphen.');
                     }
                 }
             ],

@@ -47,14 +47,18 @@ class UrlCreateFormTest extends Unit
 
     public function validUrlDataProvider()
     {
-        $fixtures = include codecept_data_dir() . 'url_data.php';
-        $fixtures = array_map(function ($array) {
-            $list = [];
-            unset($array['id'], $array['created_at'], $array['updated_at']);
-            array_push($list, $array);
-            return $list;
-        }, $fixtures);
-        return $fixtures;
+        return [
+            [
+                [
+                    'url' => '/some-url.html',
+                    'redirect_to_url' => NULL,
+                    'module_name' => 'module',
+                    'controller_name' => 'controller',
+                    'action_name' => 'action',
+                    'entity_id' => '1',
+                ],
+            ],
+        ];
     }
 
     public function notValidDataProvider()
@@ -88,42 +92,42 @@ class UrlCreateFormTest extends Unit
             'module_name contain space between words' => [
                 'module_name',
                 'some name',
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'module_name contain \n between words' => [
                 'module_name',
                 "some\nname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'module_name contain \t between words' => [
                 'module_name',
                 "some\tname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'module_name contain space at start' => [
                 'module_name',
                 " some_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'module_name contain \n at start' => [
                 'module_name',
                 "\nsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'module_name contain \t at start' => [
                 'module_name',
                 "\tsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'module_name contain space at end' => [
                 'module_name',
                 "some_name ",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'module_name contain \t at end' => [
                 'module_name',
                 "some_name\t",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name blank' => [
                 'controller_name',
@@ -138,42 +142,42 @@ class UrlCreateFormTest extends Unit
             'controller_name contain space between words' => [
                 'controller_name',
                 'some name',
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name contain \n between words' => [
                 'controller_name',
                 "some\nname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name contain \t between words' => [
                 'controller_name',
                 "some\tname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name contain space at start' => [
                 'module_name',
                 " some_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name contain \n at start' => [
                 'module_name',
                 "\nsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name contain \t at start' => [
                 'module_name',
                 "\tsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name contain space at end' => [
                 'module_name',
                 "some_name ",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'controller_name contain \t at end' => [
                 'module_name',
                 "some_name\t",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'action_name blank' => [
                 'action_name',
@@ -188,37 +192,37 @@ class UrlCreateFormTest extends Unit
             'action_name contain \n between words' => [
                 'action_name',
                 "some\nname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'action_name contain \t between words' => [
                 'action_name',
                 "some\tname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'action_name contain space at start' => [
                 'action_name',
                 " some_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'action_name contain \n at start' => [
                 'action_name',
                 "\nsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'action_name contain \t at start' => [
                 'action_name',
                 "\tsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'action_name contain space at end' => [
                 'action_name',
                 "some_name ",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'action_name contain \t at end' => [
                 'action_name',
                 "some_name\t",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'entity_id blank' => [
                 'entity_id',
@@ -233,37 +237,37 @@ class UrlCreateFormTest extends Unit
             'entity_id contain \n between words' => [
                 'entity_id',
                 "some\nname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'entity_id contain \t between words' => [
                 'entity_id',
                 "some\tname",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'entity_id contain space at start' => [
                 'entity_id',
                 " some_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'entity_id contain \n at start' => [
                 'entity_id',
                 "\nsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'entity_id contain \t at start' => [
                 'entity_id',
                 "\tsome_name",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'entity_id contain space at end' => [
                 'entity_id',
                 "some_name ",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
             'entity_id contain \t at end' => [
                 'entity_id',
                 "some_name\t",
-                'Attribute must contain only: characters, digits and underscores.',
+                'Attribute must contain only: characters, digits, underscores and hyphen.',
             ],
         ];
     }
