@@ -44,6 +44,14 @@ class UrlEntityTest extends Unit
         $this->assertTrue($v);
     }
 
+    public function testIsRedirectMethod()
+    {
+        $urlEntity = new UrlEntity();
+        $this->assertFalse($urlEntity->isRedirect());
+        $urlEntity->redirect_to_url = 1;
+        $this->assertTrue($urlEntity->isRedirect());
+    }
+
     /**
      * @param string $attributeName
      * @param mixed $attributeValue
