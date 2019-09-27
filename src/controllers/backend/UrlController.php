@@ -79,7 +79,7 @@ class UrlController extends Controller
      * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
-     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyExistException
+     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException
      */
     public function actionCreate()
     {
@@ -96,13 +96,14 @@ class UrlController extends Controller
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\EntityNotFoundException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
      * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
+     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException
+     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException
      */
     public function actionUpdate(int $id)
     {
