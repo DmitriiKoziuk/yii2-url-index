@@ -109,13 +109,31 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         }
     }
 
+    /**
+     * @param string $url
+     * @throws UrlNotFoundException
+     * @throws ExternalComponentException
+     */
     public function removeUrl(string $url): void
     {
         $urlEntity = $this->urlRepository->getByUrl($url);
-        if (! empty($urlEntity)) {
-            $this->urlRepository->delete($urlEntity);
+        if (is_null($urlEntity)) {
+            throw new UrlNotFoundException("Url '{$url}' not found.");
         }
-        return;
+        try {
+            $this->beginTransaction();
+            /** @var UrlEntity[] $redirects */
+            $redirects = $this->urlRepository->getRedirects($urlEntity->id);
+            foreach ($redirects as $redirect) {
+                $this->urlRepository->delete($redirect);
+            }
+            $this->urlRepository->delete($urlEntity);
+            $this->commitTransaction();
+            return;
+        } catch (\Exception $e) {
+            $this->rollbackTransaction();
+            throw $e;
+        }
     }
 
     public function getUrlById(int $id): ?UrlUpdateForm

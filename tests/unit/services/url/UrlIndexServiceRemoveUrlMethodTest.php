@@ -10,6 +10,7 @@ use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException;
 
 class UrlIndexServiceRemoveUrlMethodTest extends Unit
 {
@@ -25,6 +26,27 @@ class UrlIndexServiceRemoveUrlMethodTest extends Unit
 
     /**
      * @param array $data
+     * @throws \Exception
+     * @dataProvider validUrlDataProvider
+     */
+    public function testDeleteNonExistUrl(array $data)
+    {
+        /** @var MockObject|UrlRepository $urlRepository */
+        $urlRepository = $this->createMock(UrlRepository::class);
+        $urlRepository->method('getByUrl')->willReturn(null);
+
+        $service = new UrlIndexService(
+            $urlRepository,
+            null
+        );
+
+        $this->expectException(UrlNotFoundException::class);
+        $service->removeUrl($data['url']);
+    }
+
+    /**
+     * @param array $data
+     * @throws \Exception
      * @dataProvider validUrlDataProvider
      */
     public function testWithValidData(array $data)
@@ -32,6 +54,11 @@ class UrlIndexServiceRemoveUrlMethodTest extends Unit
         /** @var MockObject|UrlRepository $urlRepository */
         $urlRepository = $this->createMock(UrlRepository::class);
         $urlRepository->method('getByUrl')->willReturn(new UrlEntity($data));
+        $urlRepository->method('getRedirects')->willReturn([
+            new UrlEntity(),
+            new UrlEntity(),
+        ]);
+        $urlRepository->expects($this->exactly(3))->method('delete');
 
         $service = new UrlIndexService(
             $urlRepository,
@@ -43,12 +70,13 @@ class UrlIndexServiceRemoveUrlMethodTest extends Unit
 
     public function validUrlDataProvider(): array
     {
-        $fixtures = include codecept_data_dir() . 'url_data.php';
-        $fixtures = array_map(function ($array) {
-            $list = [];
-            array_push($list, $array);
-            return $list;
-        }, $fixtures);
-        return $fixtures;
+        return [
+            [
+                [
+                    'id' => 1,
+                    'url' => '/some-url'
+                ],
+            ],
+        ];
     }
 }
