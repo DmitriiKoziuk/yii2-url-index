@@ -13,8 +13,8 @@ use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
  * This is the model class for table "{{%dk_url_index_urls}}".
  *
  * @property int    $id
- * @property int    $url
- * @property string $redirect_to_url
+ * @property string $url
+ * @property int    $redirect_to_url
  * @property string $module_name
  * @property string $controller_name
  * @property string $action_name
