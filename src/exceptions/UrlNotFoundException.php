@@ -2,6 +2,6 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\exceptions;
 
-class UrlAlreadyExistException extends \Exception
+class UrlNotFoundException extends \Exception
 {
 }
