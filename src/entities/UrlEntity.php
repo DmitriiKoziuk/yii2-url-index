@@ -107,4 +107,9 @@ class UrlEntity extends ActiveRecord
     {
         return $this->hasOne(UrlEntity::class, ['id' => 'redirect_to_url']);
     }
+
+    public function isRedirect(): bool
+    {
+        return ! is_null($this->redirect_to_url);
+    }
 }
