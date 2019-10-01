@@ -1,4 +1,5 @@
 <?php
+
 namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
 /**

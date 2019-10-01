@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 use DmitriiKoziuk\yii2Base\BaseModule;
 
 /* @var $this yii\web\View */
-/* @var $model DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity */
+/* @var $model DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm|DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
