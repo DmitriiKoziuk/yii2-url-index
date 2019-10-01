@@ -23,6 +23,8 @@ interface UrlIndexServiceInterface
 
     public function getUrlById(int $id): ?UrlUpdateForm;
 
+    public function getUrlByUrl(string $url): ?UrlUpdateForm;
+
     public function isUrlExist(string $url): bool;
 
     public function search(UrlSearchForm $urlSearchForm): ActiveDataProvider;
