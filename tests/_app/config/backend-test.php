@@ -5,7 +5,5 @@ return yii\helpers\ArrayHelper::merge(
     require __DIR__ . '/../../../../../../backend/config/main.php',
     require __DIR__ . '/../../../../../../backend/config/main-local.php',
     require __DIR__ . '/../../../../../../backend/config/test.php',
-    [
-        'language' => 'en',
-    ]
+    require __DIR__ . '/test.php',
 );
