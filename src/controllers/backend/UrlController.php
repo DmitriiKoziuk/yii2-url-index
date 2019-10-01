@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace DmitriiKoziuk\yii2UrlIndex\controllers\backend;
 
@@ -7,14 +6,26 @@ use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
-use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntitySearch;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
 /**
  * FileController implements the CRUD actions for UrlIndexEntity model.
  */
 class UrlController extends Controller
 {
+    /**
+     * @var UrlIndexService
+     */
+    private $urlIndexService;
+
+    public function __construct($id, $module, UrlIndexService $urlIndexService, $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->urlIndexService = $urlIndexService;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -24,7 +35,7 @@ class UrlController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'delete' => ['GET'],
+                    'delete' => ['GET', 'POST'],
                 ],
             ],
         ];
@@ -36,11 +47,12 @@ class UrlController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new UrlEntitySearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $urlSearchForm = new UrlSearchForm();
+        $urlSearchForm->load(Yii::$app->request->queryParams);
+        $dataProvider = $this->urlIndexService->search($urlSearchForm);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
+            'searchModel' => $urlSearchForm,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -51,48 +63,60 @@ class UrlController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView(int $id)
     {
+        $model = $this->urlIndexService->getUrlById($id);
+        if (empty($model)) {
+            throw new NotFoundHttpException("Url with id '{$id}' not found.");
+        }
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
     /**
-     * Creates a new UrlIndexEntity model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return string|\yii\web\Response
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
+     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException
      */
     public function actionCreate()
     {
-        $model = new UrlEntity();
+        $createForm = new UrlCreateForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($createForm->load(Yii::$app->request->post())) {
+            $form = $this->urlIndexService->addUrl($createForm);
+            return $this->redirect(['view', 'id' => $form->id]);
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'model' => $createForm,
         ]);
     }
 
     /**
-     * Updates an existing UrlIndexEntity model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param int $id
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
+     * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
+     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException
+     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $urlUpdateForm = $this->urlIndexService->getUrlById($id);
+        if (empty($urlUpdateForm)) {
+            throw new NotFoundHttpException("Url with id '{$id}' not found.");
         }
-
+        if ($urlUpdateForm->load(Yii::$app->request->post())) {
+            $urlUpdateForm = $this->urlIndexService->updateUrl($urlUpdateForm);
+            return $this->redirect(['view', 'id' => $urlUpdateForm->id]);
+        }
         return $this->render('update', [
-            'model' => $model,
+            'model' => $urlUpdateForm,
         ]);
     }
 
@@ -103,26 +127,13 @@ class UrlController extends Controller
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete(int $id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the UrlIndexEntity model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return UrlEntity the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = UrlEntity::findOne($id)) !== null) {
-            return $model;
+        $url = $this->urlIndexService->getUrlById($id);
+        if (empty($url)) {
+            throw new NotFoundHttpException("Url with id '{$id}' not found.");
         }
-
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        $this->urlIndexService->removeUrl($url['url']);
+        return $this->redirect(['index']);
     }
 }

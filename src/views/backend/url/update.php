@@ -5,7 +5,7 @@ use DmitriiKoziuk\yii2Base\BaseModule;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 
 /* @var $this yii\web\View */
-/* @var $model DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity */
+/* @var $model DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm */
 
 $this->title = Yii::t('app', 'Update Url Index Entity: {name}', [
     'name' => $model->id,
