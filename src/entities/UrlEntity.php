@@ -6,7 +6,6 @@ use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
-use DmitriiKoziuk\yii2Base\BaseModule;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 
 /**
@@ -88,15 +87,15 @@ class UrlEntity extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t(BaseModule::TRANSLATE, 'ID'),
+            'id' => Yii::t('app', 'ID'),
             'url' => Yii::t(UrlIndexModule::TRANSLATE, 'Url'),
             'redirect_to_url' => Yii::t(UrlIndexModule::TRANSLATE, 'Redirect To Url'),
             'module_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Module Name'),
             'controller_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Controller Name'),
             'action_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Action Name'),
             'entity_id' => Yii::t(UrlIndexModule::TRANSLATE, 'Entity ID'),
-            'created_at' => Yii::t(BaseModule::TRANSLATE, 'Created At'),
-            'updated_at' => Yii::t(BaseModule::TRANSLATE, 'Updated At'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 
