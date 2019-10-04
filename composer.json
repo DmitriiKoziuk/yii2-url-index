@@ -17,10 +17,10 @@
   "require": {
     "php": ">=7.1.0",
     "yiisoft/yii2": "~2.0.0",
-    "dmitriikoziuk/yii2-base": "*",
-    "dmitriikoziuk/yii2-module-manager": "*",
-    "dmitriikoziuk/yii2-config-manager": "*",
-    "dmitriikoziuk/yii2-web-backend-lock": "*"
+    "dmitriikoziuk/yii2-base": "~0.3.0",
+    "dmitriikoziuk/yii2-module-manager": "~0.3.0",
+    "dmitriikoziuk/yii2-config-manager": "~0.3.0",
+    "dmitriikoziuk/yii2-web-backend-lock": "~0.1.0"
   },
   "autoload": {
     "psr-4": {

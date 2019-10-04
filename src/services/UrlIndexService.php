@@ -5,7 +5,7 @@ namespace DmitriiKoziuk\yii2UrlIndex\services;
 use yii\db\Connection;
 use yii\data\ActiveDataProvider;
 use DmitriiKoziuk\yii2Base\services\DBActionService;
-use DmitriiKoziuk\yii2Base\traits\ModelValidator;
+use DmitriiKoziuk\yii2Base\traits\ModelValidatorTrait;
 use DmitriiKoziuk\yii2Base\exceptions\DataNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\InvalidFormException;
 use DmitriiKoziuk\yii2Base\exceptions\EntityNotValidException;
@@ -23,7 +23,7 @@ use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException;
 
 class UrlIndexService extends DBActionService implements UrlIndexServiceInterface
 {
-    use ModelValidator;
+    use ModelValidatorTrait;
 
     /**
      * @var UrlRepositoryInterface
