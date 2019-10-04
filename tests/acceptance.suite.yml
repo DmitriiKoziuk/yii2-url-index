@@ -15,9 +15,9 @@ env:
         modules:
             enabled:
                 - PhpBrowser:
-                    url: http://b.yii2-extensions.t/
+                    url: http://b.yii2-url-index.yii2-extensions.t/
     frontend:
         modules:
             enabled:
                 - PhpBrowser:
-                    url: http://yii2-extensions.t/
+                    url: http://yii2-url-index.yii2-extensions.t/
