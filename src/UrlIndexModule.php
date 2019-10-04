@@ -82,7 +82,13 @@ class UrlIndexModule extends Module implements ModuleInterface
             $this->viewPath = '@DmitriiKoziuk/yii2UrlIndex/views/frontend';
         }
         if ($app instanceof ConsoleApp) {
-            $app->controllerMap['migrate']['migrationNamespaces'][] = __NAMESPACE__ . '\migrations';
+            $app->controllerMap['migrate'] = [
+                'class' => 'yii\console\controllers\MigrateController',
+                'migrationPath' => null,
+                'migrationNamespaces' => [
+                    __NAMESPACE__ . '\migrations',
+                ],
+            ];
         }
     }
 
