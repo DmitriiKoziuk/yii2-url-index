@@ -84,7 +84,6 @@ class UrlIndexModule extends Module implements ModuleInterface
         if ($app instanceof ConsoleApp) {
             $app->controllerMap['migrate'] = [
                 'class' => 'yii\console\controllers\MigrateController',
-                'migrationPath' => null,
                 'migrationNamespaces' => [
                     __NAMESPACE__ . '\migrations',
                 ],
