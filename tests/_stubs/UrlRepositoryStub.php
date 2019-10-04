@@ -41,4 +41,9 @@ class UrlRepositoryStub implements UrlRepositoryInterface
     {
         return UrlEntity::find();
     }
+
+    public function getRedirects(int $urlId): array
+    {
+        return [];
+    }
 }

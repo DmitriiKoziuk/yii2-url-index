@@ -18,8 +18,10 @@ env:
             config:
                 Yii2:
                     configFile: 'tests/_app/config/backend-test.php'
+                    recreateApplication: true
     frontend:
         modules:
             config:
                 Yii2:
                     configFile: 'tests/_app/config/frontend-test.php'
+                    recreateApplication: true
