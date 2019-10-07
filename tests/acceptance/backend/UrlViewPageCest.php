@@ -2,6 +2,9 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
+use Yii;
+use yii\di\Container;
+use yii\helpers\Url;
 use Codeception\Example;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
@@ -22,9 +25,14 @@ class UrlViewPageCest
         ];
     }
 
+    public function _before()
+    {
+        Yii::$container = new Container();
+    }
+
     public function trySignIn(AcceptanceTester $I)
     {
-        $I->amOnPage('/site/login');
+        $I->amOnPage(Url::toRoute(['/site/login']));
         $I->see('Please fill out the following fields to login:');
         $I->fillField('LoginForm[username]', 'erau');
         $I->fillField('LoginForm[password]', 'password_0');
@@ -44,7 +52,7 @@ class UrlViewPageCest
     public function tryOpenViewPage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is url view page open.');
-        $I->amOnPage("/dk-url-index/url/view?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/view', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
 
         $I->see("Url created: {$existUrls['url']}", 'h1');
@@ -59,7 +67,7 @@ class UrlViewPageCest
     public function checkIsUpdateButtonExistOnPage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is update button exist on page.');
-        $I->amOnPage("/dk-url-index/url/view?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/view', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
 
         $I->seeElement('a#update-url');
@@ -74,7 +82,7 @@ class UrlViewPageCest
     public function checkIsDeleteButtonExistOnPage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is delete button exist on page.');
-        $I->amOnPage("/dk-url-index/url/view?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/view', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
 
         $I->seeElement('a#delete-url');
@@ -89,7 +97,7 @@ class UrlViewPageCest
     public function checkIsAllRequiredAttributesExistOnPage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is all required attributes exist on page.');
-        $I->amOnPage("/dk-url-index/url/view?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/view', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
 
         $I->see('ID', 'table th');

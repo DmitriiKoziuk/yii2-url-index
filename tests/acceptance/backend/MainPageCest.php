@@ -2,6 +2,9 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
+use Yii;
+use yii\di\Container;
+use yii\helpers\Url;
 use Codeception\Example;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
@@ -22,9 +25,14 @@ class MainPageCest
         ];
     }
 
+    public function _before()
+    {
+        Yii::$container = new Container();
+    }
+
     public function trySignIn(AcceptanceTester $I)
     {
-        $I->amOnPage('/site/login');
+        $I->amOnPage(Url::toRoute(['/site/login']));
         $I->see('Please fill out the following fields to login:');
         $I->fillField('LoginForm[username]', 'erau');
         $I->fillField('LoginForm[password]', 'password_0');
@@ -42,7 +50,7 @@ class MainPageCest
     public function tryOpenMainPage(AcceptanceTester $I)
     {
         $I->wantTo('Check is main page open.');
-        $I->amOnPage('/dk-url-index/url/index');
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/index']));
         $I->seeResponseCodeIs(200);
 
         $I->see('Urls', 'h1');
@@ -55,7 +63,7 @@ class MainPageCest
     public function checkIsCreateUrlButtonExistOnPage(AcceptanceTester $I)
     {
         $I->wantTo('Check is create url button exist on page.');
-        $I->amOnPage('/dk-url-index/url/index');
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/index']));
         $I->seeResponseCodeIs(200);
 
         $I->see('Create Url Index Entity', 'a');
@@ -70,7 +78,7 @@ class MainPageCest
     public function checkIsUrlsExistOnMainPage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is urls load and view on page.');
-        $I->amOnPage('/dk-url-index/url/index');
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/index']));
         $I->seeResponseCodeIs(200);
 
         $I->see($existUrls['url']);
@@ -92,7 +100,7 @@ class MainPageCest
     public function checkIsUrlNumberEquivalentOfUrlsInDB(AcceptanceTester $I)
     {
         $I->wantTo('Check is url number equivalent of urls in DB.');
-        $I->amOnPage('/dk-url-index/url/index');
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/index']));
         $I->seeResponseCodeIs(200);
 
         $I->see('Showing 1-3 of 3 items.');
@@ -107,7 +115,7 @@ class MainPageCest
     public function trySearchById(AcceptanceTester $I, Example $url)
     {
         $I->wantTo('try search by id field.');
-        $I->amOnPage("/dk-url-index/url/index?UrlSearchForm[id]={$url['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/index', 'UrlSearchForm[id]' => $url['id']]));
         $I->seeResponseCodeIs(200);
 
         $I->see('Showing 1-1 of 1 item.');
@@ -123,7 +131,7 @@ class MainPageCest
     public function trySearchUrlUrl(AcceptanceTester $I, Example $url)
     {
         $I->wantTo('try search by url field.');
-        $I->amOnPage("/dk-url-index/url/index?UrlSearchForm[url]={$url['url']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/index', 'UrlSearchForm[url]' => $url['url']]));
         $I->seeResponseCodeIs(200);
 
         $I->see('Showing 1-1 of 1 item.');
