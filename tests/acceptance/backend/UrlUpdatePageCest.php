@@ -2,6 +2,9 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
+use Yii;
+use yii\di\Container;
+use yii\helpers\Url;
 use Codeception\Example;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
@@ -22,9 +25,14 @@ class UrlUpdatePageCest
         ];
     }
 
+    public function _before()
+    {
+        Yii::$container = new Container();
+    }
+
     public function trySignIn(AcceptanceTester $I)
     {
-        $I->amOnPage('/site/login');
+        $I->amOnPage(Url::toRoute(['/site/login']));
         $I->see('Please fill out the following fields to login:');
         $I->fillField('LoginForm[username]', 'erau');
         $I->fillField('LoginForm[password]', 'password_0');
@@ -44,7 +52,7 @@ class UrlUpdatePageCest
     public function tryOpenUpdatePage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is url update page open.');
-        $I->amOnPage("/dk-url-index/url/update?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/update', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
 
         $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
@@ -59,7 +67,7 @@ class UrlUpdatePageCest
     {
         $I->wantTo('check is non exist url update page send status code 404.');
         $id = rand(100, 1000);
-        $I->amOnPage("/dk-url-index/url/update?id={$id}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/update', 'id' => $id]));
         $I->seeResponseCodeIs(404);
     }
 
@@ -72,7 +80,7 @@ class UrlUpdatePageCest
     public function existsOnPage(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is all field exist on page.');
-        $I->amOnPage("/dk-url-index/url/update?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/update', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
         $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
 
@@ -93,7 +101,7 @@ class UrlUpdatePageCest
     public function hasRelevantData(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is all field has relevant data.');
-        $I->amOnPage("/dk-url-index/url/update?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/update', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
         $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
 
@@ -116,7 +124,7 @@ class UrlUpdatePageCest
     public function hasSaveButton(AcceptanceTester $I, Example $existUrls)
     {
         $I->wantTo('Check is page has "Save" button');
-        $I->amOnPage("/dk-url-index/url/update?id={$existUrls['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/update', 'id' => $existUrls['id']]));
         $I->seeResponseCodeIs(200);
         $I->see("Update Url Index Entity: {$existUrls['id']}", 'h1');
 
