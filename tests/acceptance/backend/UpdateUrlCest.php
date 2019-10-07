@@ -2,6 +2,9 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
+use Yii;
+use yii\di\Container;
+use yii\helpers\Url;
 use Codeception\Example;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
@@ -22,9 +25,14 @@ class UpdateUrlCest
         ];
     }
 
+    public function _before()
+    {
+        Yii::$container = new Container();
+    }
+
     public function trySignIn(AcceptanceTester $I)
     {
-        $I->amOnPage('/site/login');
+        $I->amOnPage(Url::toRoute(['/site/login']));
         $I->see('Please fill out the following fields to login:');
         $I->fillField('LoginForm[username]', 'erau');
         $I->fillField('LoginForm[password]', 'password_0');
@@ -43,7 +51,7 @@ class UpdateUrlCest
      */
     public function tryUpdateValue(AcceptanceTester $I, Example $data)
     {
-        $I->amOnPage("/dk-url-index/url/update?id={$data['id']}");
+        $I->amOnPage(Url::toRoute(['/dk-url-index/url/update', 'id' => $data['id']]));
         $I->see("Update Url Index Entity: {$data['id']}", 'h1');
         foreach ($data['fields'] as $name => $value) {
             $I->fillField(['name' => $name], $value);

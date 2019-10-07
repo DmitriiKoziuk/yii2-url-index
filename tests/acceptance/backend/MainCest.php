@@ -1,7 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests;
 
+use Yii;
+use yii\di\Container;
+use yii\helpers\Url;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
 
 class MainCest
@@ -18,9 +21,14 @@ class MainCest
         ];
     }
 
+    public function _before()
+    {
+        Yii::$container = new Container();
+    }
+
     public function trySignIn(AcceptanceTester $I)
     {
-        $I->amOnPage('/site/login');
+        $I->amOnPage(Url::toRoute(['/site/login']));
         $I->see('Please fill out the following fields to login:');
         $I->fillField('LoginForm[username]', 'erau');
         $I->fillField('LoginForm[password]', 'password_0');
@@ -40,7 +48,7 @@ class MainCest
     public function tryClickToModuleLinkInNavigationMenu(AcceptanceTester $I)
     {
         $I->setcookie('advanced-backend', $this->loggedInCookie);
-        $I->amOnPage('/');
+        $I->amOnPage(Url::toRoute('/'));
         $I->seeResponseCodeIs(200);
         $I->click('Url index', '.dropdown-menu');
         $I->seeResponseCodeIs(200);
