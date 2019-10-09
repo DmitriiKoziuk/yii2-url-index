@@ -15,5 +15,12 @@ interface UrlRepositoryInterface extends ActiveRecordRepositoryInterface
 
     public function getRedirects(int $urlId): array;
 
+    public function getEntityUrl(
+        string $moduleName,
+        string $controllerName,
+        string $actionName,
+        string $entityId
+    ): ?UrlEntity;
+
     public function urlSearchQueryBuilder(UrlSearchForm $form): ActiveQuery;
 }

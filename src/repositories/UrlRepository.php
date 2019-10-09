@@ -30,6 +30,24 @@ class UrlRepository extends AbstractActiveRecordRepository implements UrlReposit
         return $entities;
     }
 
+    public function getEntityUrl(
+        string $moduleName,
+        string $controllerName,
+        string $actionName,
+        string $entityId
+    ): ?UrlEntity {
+        /** @var UrlEntity|null $entity */
+        $entity = UrlEntity::find()
+            ->where([
+                'module_name' => $moduleName,
+                'controller_name' => $controllerName,
+                'action_name' => $actionName,
+                'entity_id' => $entityId,
+            ])
+            ->one();
+        return $entity;
+    }
+
     /**
      * @param UrlSearchForm $form
      * @return ActiveQuery
