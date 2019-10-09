@@ -22,7 +22,7 @@ interface UrlIndexServiceInterface
 
     public function removeUrl(string $url): void;
 
-    public function removeEntity(RemoveEntityForm $removeEntityForm): void;
+    public function removeEntityUrl(RemoveEntityForm $removeEntityForm): void;
 
     public function getUrlById(int $id): ?UrlUpdateForm;
 
