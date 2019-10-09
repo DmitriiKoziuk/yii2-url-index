@@ -15,11 +15,14 @@ use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\RemoveEntityForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\EntityUrlNotFoundException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\RemoveEntityFormNotValidException;
 
 class UrlIndexService extends DBActionService implements UrlIndexServiceInterface
 {
@@ -134,6 +137,31 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
             $this->rollbackTransaction();
             throw $e;
         }
+    }
+
+    /**
+     * @param RemoveEntityForm $removeEntityForm
+     * @throws DataNotValidException|RemoveEntityFormNotValidException
+     * @throws EntityUrlNotFoundException
+     */
+    public function removeEntityUrl(RemoveEntityForm $removeEntityForm): void
+    {
+        $this->validateModels(
+            [$removeEntityForm],
+            new RemoveEntityFormNotValidException('Remove entity form not valid.')
+        );
+
+        $urlEntity = $this->urlRepository->getEntityUrl(
+            $removeEntityForm->module_name,
+            $removeEntityForm->controller_name,
+            $removeEntityForm->action_name,
+            $removeEntityForm->entity_id
+        );
+        if (is_null($urlEntity)) {
+            throw new EntityUrlNotFoundException('Entity url not found. Nothing remove.');
+        }
+
+        $this->urlRepository->delete($urlEntity);
     }
 
     public function getUrlById(int $id): ?UrlUpdateForm
