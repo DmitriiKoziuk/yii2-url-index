@@ -8,6 +8,7 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\RemoveEntityForm;
+use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
 
 interface UrlIndexServiceInterface
 {
@@ -23,6 +24,8 @@ interface UrlIndexServiceInterface
     public function removeUrl(string $url): void;
 
     public function removeEntityUrl(RemoveEntityForm $removeEntityForm): void;
+
+    public function updateEntityUrl(UpdateEntityUrlForm $updateEntityUrlForm): UrlUpdateForm;
 
     public function getUrlById(int $id): ?UrlUpdateForm;
 
