@@ -85,6 +85,57 @@ class UrlRepositoryTest extends Unit
         $this->assertEquals(1, count($redirects));
     }
 
+    public function testMethodGetEntityUrlReturnEntity(): void
+    {
+        $searchAttributes = [
+            'module_name' => 'module',
+            'controller_name' => 'controller',
+            'action_name' => 'action',
+            'entity_id' => '1',
+        ];
+        $this->tester->seeRecord(UrlEntity::class, $searchAttributes);
+
+        $urlRepository = new UrlRepository();
+        $urlEntity = $urlRepository->getEntityUrl(
+            'module',
+            'controller',
+            'action',
+            '1'
+        );
+        $this->assertNotEmpty($urlEntity);
+        $this->assertInstanceOf(UrlEntity::class, $urlEntity);
+        $this->assertEquals(
+            $searchAttributes,
+            $urlEntity->getAttributes(null, [
+                'id',
+                'url',
+                'redirect_to_url',
+                'created_at',
+                'updated_at',
+            ])
+        );
+    }
+
+    public function testMethodGetEntityUrlReturnNUll(): void
+    {
+        $searchAttributes = [
+            'module_name' => 'module_zzz',
+            'controller_name' => 'controller_zzz',
+            'action_name' => 'action_zzz',
+            'entity_id' => '1',
+        ];
+        $this->tester->dontSeeRecord(UrlEntity::class, $searchAttributes);
+
+        $urlRepository = new UrlRepository();
+        $urlEntity = $urlRepository->getEntityUrl(
+            'module_zzz',
+            'controller_zzz',
+            'action_zzz',
+            '1'
+        );
+        $this->assertEmpty($urlEntity);
+    }
+
     /**
      * @param array $data
      * @dataProvider existUrlsDataProvider
