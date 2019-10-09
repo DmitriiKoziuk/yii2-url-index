@@ -28,6 +28,11 @@ class UrlRepositoryStub implements UrlRepositoryInterface
         return empty($this->data) ? null : new UrlEntity($this->data->getAttributes());
     }
 
+    public function getEntityUrl(string $moduleName, string $controllerName, string $actionName, string $entityId): ?UrlEntity
+    {
+        return new UrlEntity($this->data->getAttributes());
+    }
+
     public function save(ActiveRecord $activeRecord): ActiveRecord
     {
         return new UrlEntity($this->data->getAttributes());
