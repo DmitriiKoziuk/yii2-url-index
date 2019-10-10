@@ -2,6 +2,8 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex\tests\acceptance;
 
+use Yii;
+use yii\di\Container;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\AcceptanceTester;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
@@ -18,8 +20,9 @@ class UrlControllerCest
         ];
     }
 
-    public function _before(AcceptanceTester $I)
+    public function _after(AcceptanceTester $I)
     {
+        Yii::$container = new Container();
     }
 
     /**
