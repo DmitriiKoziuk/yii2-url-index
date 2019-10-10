@@ -40,7 +40,7 @@ class UrlIndexServiceUpdateEntityUrlMethodTest extends \Codeception\Test\Unit
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
-    public function testUpdateEntityUrlFormNotValid()
+    public function testEntityUrlFormNotValid()
     {
         $form = new UpdateEntityUrlForm();
         /** @var UrlIndexService $service */
@@ -55,7 +55,7 @@ class UrlIndexServiceUpdateEntityUrlMethodTest extends \Codeception\Test\Unit
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
-    public function testTryUpdateNonExistUrl()
+    public function testUpdateNonExistUrl()
     {
         /** @var UrlIndexService $service */
         $service = Yii::$container->get(UrlIndexService::class);
@@ -73,26 +73,59 @@ class UrlIndexServiceUpdateEntityUrlMethodTest extends \Codeception\Test\Unit
         $service->updateEntityUrl($form);
     }
 
+    public function testUpdateRedirectUrl()
+    {
+        $redirectUrlAttributes = [
+            'url' => '/some-url-3.html',
+            'redirect_to_url' => 1,
+            'module_name' => 'dk-url-index',
+            'controller_name' => 'url',
+            'action_name' => 'redirect',
+        ];
+        $updateAttributes = [
+            'url' => '/some-url-3.html',
+            'module_name' => 'module',
+            'controller_name' => 'controller',
+            'action_name' => 'action',
+            'entity_id' => '2',
+        ];
+        $this->tester->seeRecord(UrlEntity::class, $redirectUrlAttributes);
+        $this->tester->dontSeeRecord(UrlEntity::class, $updateAttributes);
+
+        /** @var UrlIndexService $service */
+        $service = Yii::$container->get(UrlIndexService::class);
+        $form = new UpdateEntityUrlForm($updateAttributes);
+        $this->assertTrue($form->validate());
+        $service->updateEntityUrl($form);
+
+        $this->tester->dontSeeRecord(UrlEntity::class, $redirectUrlAttributes);
+        $this->tester->seeRecord(UrlEntity::class, $updateAttributes);
+    }
+
     /**
      * @throws EntityUrlNotFoundException
      * @throws UrlAlreadyHasBeenTakenException
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
-    public function testUrlAlreadyHasBenTaken()
+    public function testUpdateOccupiedUrl()
     {
         /** @var UrlIndexService $service */
         $service = Yii::$container->get(UrlIndexService::class);
-        $updateEntityAttributes = [
+        $this->tester->seeRecord(UrlEntity::class, [
             'url' => '/some-url.html',
             'module_name' => 'module',
             'controller_name' => 'controller',
             'action_name' => 'action',
             'entity_id' => '1',
-        ];
-        $this->tester->seeRecord(UrlEntity::class, [
-            'url' => '/some-url-2.html',
         ]);
+        $updateEntityAttributes = [
+            'url' => '/some-url.html',
+            'module_name' => 'module',
+            'controller_name' => 'controller',
+            'action_name' => 'action',
+            'entity_id' => '2',
+        ];
         $form = new UpdateEntityUrlForm($updateEntityAttributes);
         $this->assertTrue($form->validate());
         $this->expectException(UrlAlreadyHasBeenTakenException::class);
@@ -105,7 +138,33 @@ class UrlIndexServiceUpdateEntityUrlMethodTest extends \Codeception\Test\Unit
      * @throws \yii\base\InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
-    public function testUpdateEntityUrlSuccessful()
+    public function testOverwriteOwnUrlSameData()
+    {
+        $updatedEntityAttributes = [
+            'url' => '/some-url.html',
+            'module_name' => 'module',
+            'controller_name' => 'controller',
+            'action_name' => 'action',
+            'entity_id' => '1',
+        ];
+        $this->tester->seeRecord(UrlEntity::class, $updatedEntityAttributes);
+
+        $form = new UpdateEntityUrlForm($updatedEntityAttributes);
+        $this->assertTrue($form->validate());
+        /** @var UrlIndexService $service */
+        $service = Yii::$container->get(UrlIndexService::class);
+        $service->updateEntityUrl($form);
+
+        $this->tester->seeRecord(UrlEntity::class, $updatedEntityAttributes);
+    }
+
+    /**
+     * @throws EntityUrlNotFoundException
+     * @throws UrlAlreadyHasBeenTakenException
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
+     */
+    public function testUpdateUrlSuccessful()
     {
         $oldUrlAttributes = [
             'id' => 2,

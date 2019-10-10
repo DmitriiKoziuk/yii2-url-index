@@ -94,6 +94,9 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
 
         try {
             $this->beginTransaction();
+            if (! is_null($existUrl)) {
+                $this->urlRepository->delete($existUrl);
+            }
             $urlForm = $this->_updateUrl(
                 $updatedUrl,
                 $urlUpdateForm,
@@ -177,12 +180,22 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         }
 
         $existUrl = $this->urlRepository->getByUrl($updateEntityUrlForm->url);
-        if (! is_null($existUrl) && ! $existUrl->isRedirect()) {
+        if (
+            ! is_null($existUrl) &&
+            ! $existUrl->isRedirect() &&
+            ! $existUrl->isOwner($updateEntityUrlForm)
+        ) {
             throw new UrlAlreadyHasBeenTakenException("Url '{$updateEntityUrlForm->url}' already exist in index.");
         }
 
         try {
             $this->beginTransaction();
+            if (
+                ! is_null($existUrl) &&
+                ! $existUrl->isOwner($updateEntityUrlForm)
+            ) {
+                $this->urlRepository->delete($existUrl);
+            }
             $urlForm = $this->_updateUrl(
                 $updatedUrl,
                 $updateEntityUrlForm,
@@ -274,9 +287,6 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         Model $updateEntityUrlForm,
         UrlEntity $existUrl = null
     ): UrlUpdateForm {
-        if (! is_null($existUrl)) {
-            $this->urlRepository->delete($existUrl);
-        }
         $oldUrl = $updatedUrl->url;
         $updatedUrl->setAttributes($updateEntityUrlForm->getAttributes(
             null,
