@@ -30,6 +30,10 @@ class UrlUpdatePageCest
         Yii::$container = new Container();
     }
 
+    /**
+     * @env backend
+     * @param AcceptanceTester $I
+     */
     public function trySignIn(AcceptanceTester $I)
     {
         $I->amOnPage(Url::toRoute(['/site/login']));
@@ -44,6 +48,7 @@ class UrlUpdatePageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @param Example $existUrls
      * @depends trySignIn
@@ -59,6 +64,7 @@ class UrlUpdatePageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @depends trySignIn
      * @dataProvider urlDataProvider
@@ -72,6 +78,7 @@ class UrlUpdatePageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @param Example $existUrls
      * @depends tryOpenUpdatePage
@@ -93,6 +100,7 @@ class UrlUpdatePageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @param Example $existUrls
      * @depends tryOpenUpdatePage
@@ -116,6 +124,7 @@ class UrlUpdatePageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @param Example $existUrls
      * @depends tryOpenUpdatePage
