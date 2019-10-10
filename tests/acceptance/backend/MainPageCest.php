@@ -111,7 +111,7 @@ class MainPageCest
         $I->amOnPage(Url::toRoute(['/dk-url-index/url/index']));
         $I->seeResponseCodeIs(200);
 
-        $I->see('Showing 1-5 of 5 items.');
+        $I->see('Showing 1-6 of 6 items.');
     }
 
     /**
