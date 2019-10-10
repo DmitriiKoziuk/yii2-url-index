@@ -32,4 +32,11 @@ class UrlController extends Controller
         }
         return $this->redirect($redirectTo->url, $url->entity_id);
     }
+
+    public function actionTest(UrlUpdateForm $url)
+    {
+        return $this->render('test', [
+            'url' => $url,
+        ]);
+    }
 }

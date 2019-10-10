@@ -5,4 +5,4 @@
  * @var $url \DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm
  */
 
-echo 'Test page load successful.';
+echo 'Test page open successful.';

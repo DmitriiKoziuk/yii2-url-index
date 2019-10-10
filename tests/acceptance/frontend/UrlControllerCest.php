@@ -25,11 +25,20 @@ class UrlControllerCest
         Yii::$container = new Container();
     }
 
+    public function tryOpenTestPage(AcceptanceTester $I)
+    {
+        $testPageUrl = '/test';
+        $I->seeRecord(UrlEntity::class, ['url' => $testPageUrl]);
+        $I->amOnPage($testPageUrl);
+        $I->seeResponseCodeIs(200);
+        $I->see('Test page open successful.');
+    }
+
     /**
      * @env frontend
      * @param AcceptanceTester $I
      */
-    public function tryRedirect(AcceptanceTester $I)
+    public function tryOpenRedirectUrl(AcceptanceTester $I)
     {
         $startUrl = '/some-url-3.html';
         $destinationUrl = '/some-url.html';
