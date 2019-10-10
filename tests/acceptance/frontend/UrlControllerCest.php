@@ -25,6 +25,10 @@ class UrlControllerCest
         Yii::$container = new Container();
     }
 
+    /**
+     * @env frontend
+     * @param AcceptanceTester $I
+     */
     public function tryOpenTestPage(AcceptanceTester $I)
     {
         $testPageUrl = '/test';
