@@ -8,7 +8,7 @@ actor: AcceptanceTester
 modules:
     enabled:
         - Yii2:
-              part: [init, fixtures]
+              part: [init, orm, fixtures]
     step_decorators: ~
 env:
     backend:
