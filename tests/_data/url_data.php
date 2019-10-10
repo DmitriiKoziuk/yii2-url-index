@@ -55,4 +55,15 @@ return [
         'created_at' => '1392559490',
         'updated_at' => '1392559490',
     ],
+    'url6' => [
+        'id' => 6,
+        'url' => '/test',
+        'redirect_to_url' => NULL,
+        'module_name' => 'dk-url-index',
+        'controller_name' => 'url',
+        'action_name' => 'test',
+        'entity_id' => '1',
+        'created_at' => '1392559490',
+        'updated_at' => '1392559490',
+    ],
 ];
