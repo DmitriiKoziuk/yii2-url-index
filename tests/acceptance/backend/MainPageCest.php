@@ -30,6 +30,10 @@ class MainPageCest
         Yii::$container = new Container();
     }
 
+    /**
+     * @env backend
+     * @param AcceptanceTester $I
+     */
     public function trySignIn(AcceptanceTester $I)
     {
         $I->amOnPage(Url::toRoute(['/site/login']));
@@ -44,6 +48,7 @@ class MainPageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @depends trySignIn
      */
@@ -57,6 +62,7 @@ class MainPageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @depends trySignIn
      */
@@ -70,6 +76,7 @@ class MainPageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @param Example $existUrls
      * @depends tryOpenMainPage
@@ -94,6 +101,7 @@ class MainPageCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @depends tryOpenMainPage
      */
@@ -103,10 +111,11 @@ class MainPageCest
         $I->amOnPage(Url::toRoute(['/dk-url-index/url/index']));
         $I->seeResponseCodeIs(200);
 
-        $I->see('Showing 1-3 of 3 items.');
+        $I->see('Showing 1-5 of 5 items.');
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @param Example $url
      * @depends tryOpenMainPage
@@ -117,24 +126,21 @@ class MainPageCest
         $I->wantTo('try search by id field.');
         $I->amOnPage(Url::toRoute(['/dk-url-index/url/index', 'UrlSearchForm[id]' => $url['id']]));
         $I->seeResponseCodeIs(200);
-
-        $I->see('Showing 1-1 of 1 item.');
         $I->see($url['url']);
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @param Example $url
      * @depends tryOpenMainPage
      * @dataProvider oneUrlDataProvider
      */
-    public function trySearchUrlUrl(AcceptanceTester $I, Example $url)
+    public function trySearchUrlField(AcceptanceTester $I, Example $url)
     {
         $I->wantTo('try search by url field.');
         $I->amOnPage(Url::toRoute(['/dk-url-index/url/index', 'UrlSearchForm[url]' => $url['url']]));
         $I->seeResponseCodeIs(200);
-
-        $I->see('Showing 1-1 of 1 item.');
         $I->see($url['url']);
     }
 

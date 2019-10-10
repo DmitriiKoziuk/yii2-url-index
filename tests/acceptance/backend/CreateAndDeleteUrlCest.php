@@ -27,6 +27,10 @@ class CreateAndDeleteUrlCest
         Yii::$container = new Container();
     }
 
+    /**
+     * @env backend
+     * @param AcceptanceTester $I
+     */
     public function trySignIn(AcceptanceTester $I)
     {
         $I->amOnPage(Url::toRoute(['/site/login']));
@@ -43,6 +47,7 @@ class CreateAndDeleteUrlCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @depends trySignIn
      */
@@ -57,6 +62,7 @@ class CreateAndDeleteUrlCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @depends trySignIn
      */
@@ -80,6 +86,7 @@ class CreateAndDeleteUrlCest
     }
 
     /**
+     * @env backend
      * @param AcceptanceTester $I
      * @depends tryCreateUrlWithAllFieldSet
      */
