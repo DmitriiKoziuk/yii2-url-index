@@ -9,6 +9,7 @@ use Faker\Provider\Base;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
+use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
 
 class UrlEntityTest extends Unit
 {
@@ -50,6 +51,21 @@ class UrlEntityTest extends Unit
         $this->assertFalse($urlEntity->isRedirect());
         $urlEntity->redirect_to_url = 1;
         $this->assertTrue($urlEntity->isRedirect());
+    }
+
+    public function testIsOwned(): void
+    {
+        $attributes = [
+            'module_name' => 'module',
+            'controller_name' => 'controller',
+            'action_name' => 'action',
+            'entity_id' => '1',
+        ];
+        $urlEntity = new UrlEntity();
+        $updateEntityUrlForm = new UpdateEntityUrlForm($attributes);
+        $this->assertFalse($urlEntity->isOwner($updateEntityUrlForm));
+        $urlEntity->setAttributes($attributes);
+        $this->assertTrue($urlEntity->isOwner($updateEntityUrlForm));
     }
 
     /**

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DmitriiKoziuk\yii2UrlIndex\entities;
 
@@ -7,6 +7,7 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\behaviors\TimestampBehavior;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
+use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
 
 /**
  * This is the model class for table "{{%dk_url_index_urls}}".
@@ -110,5 +111,25 @@ class UrlEntity extends ActiveRecord
     public function isRedirect(): bool
     {
         return ! is_null($this->redirect_to_url);
+    }
+
+    public function isOwner(UpdateEntityUrlForm $updateEntityUrlForm): bool
+    {
+        $entityAttributes = $this->getAttributes([
+            'module_name',
+            'controller_name',
+            'action_name',
+            'entity_id',
+        ]);
+        $formAttributes = $updateEntityUrlForm->getAttributes([
+            'module_name',
+            'controller_name',
+            'action_name',
+            'entity_id',
+        ]);
+        if (empty(array_diff($entityAttributes, $formAttributes))) {
+            return true;
+        }
+        return false;
     }
 }
