@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace DmitriiKoziuk\yii2UrlIndex;
 
@@ -63,6 +62,7 @@ class UrlIndexModule extends Module implements ModuleInterface
         $this->initLocalProperties($app);
         $this->registerTranslation($app);
         $this->registerClassesToDIContainer($app);
+        $this->registerUrlRules($app);
     }
 
     private function initLocalProperties(BaseApp $app)
@@ -124,5 +124,16 @@ class UrlIndexModule extends Module implements ModuleInterface
                 $this->dbConnection
             );
         });
+    }
+
+    private function registerUrlRules(BaseApp $app): void
+    {
+        if ($app instanceof WebApp && $app->id == $this->frontendAppId) {
+            $app->getUrlManager()->addRules([
+                [
+                    'class' => __NAMESPACE__ . '\components\UrlRule',
+                ],
+            ]);
+        }
     }
 }
