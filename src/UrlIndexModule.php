@@ -9,6 +9,7 @@ use yii\web\Application as WebApp;
 use yii\base\Application as BaseApp;
 use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
+use DmitriiKoziuk\yii2ModuleManager\ModuleManager;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
@@ -52,7 +53,9 @@ class UrlIndexModule extends Module implements ModuleInterface
 
     public static function requireOtherModulesToBeActive(): array
     {
-        return [];
+        return [
+            ModuleManager::class,
+        ];
     }
 
     public function init(): void
@@ -82,12 +85,10 @@ class UrlIndexModule extends Module implements ModuleInterface
             $this->viewPath = '@DmitriiKoziuk/yii2UrlIndex/views/frontend';
         }
         if ($app instanceof ConsoleApp) {
-            $app->controllerMap['migrate'] = [
-                'class' => 'yii\console\controllers\MigrateController',
-                'migrationNamespaces' => [
-                    __NAMESPACE__ . '\migrations',
-                ],
-            ];
+            array_push(
+                $app->controllerMap['migrate']['migrationNamespaces'],
+                __NAMESPACE__ . '\migrations'
+            );
         }
     }
 
