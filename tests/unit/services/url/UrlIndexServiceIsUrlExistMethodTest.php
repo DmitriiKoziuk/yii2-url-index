@@ -9,7 +9,6 @@ use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_stubs\UrlRepositoryStub;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 
-
 class UrlIndexServiceIsUrlExistMethodTest extends Unit
 {
     /**

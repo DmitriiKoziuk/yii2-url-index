@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace DmitriiKoziuk\yii2UrlIndex\tests;
+namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\forms;
 
 use Yii;
 use yii\di\Container;

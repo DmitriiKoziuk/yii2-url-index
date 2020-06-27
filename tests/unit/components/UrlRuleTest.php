@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace DmitriiKoziuk\yii2UrlIndex\tests;
+namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\components;
 
 use Yii;
 use yii\di\Container;
+use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
 use DmitriiKoziuk\yii2UrlIndex\components\UrlRule;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
