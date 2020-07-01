@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 
 /**
  * @var $this yii\web\View
@@ -31,12 +32,27 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'url',
             'redirect_to_url',
-            'module_name',
-            'controller_name',
-            'action_name',
+            [
+                  'label' => 'Module name',
+                  'content' => function (UrlEntity $model) {
+                      return $model->moduleEntity->module_name;
+                  },
+            ],
+            [
+                'label' => 'Controller name',
+                'content' => function (UrlEntity $model) {
+                    return $model->moduleEntity->controller_name;
+                },
+            ],
+            [
+                'label' => 'Action name',
+                'content' => function (UrlEntity $model) {
+                    return $model->moduleEntity->action_name;
+                },
+            ],
             'entity_id',
-            'created_at:datetime',
-            'updated_at:datetime',
+            //'created_at:datetime',
+            //'updated_at:datetime',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

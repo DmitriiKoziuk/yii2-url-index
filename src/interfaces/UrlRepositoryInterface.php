@@ -23,4 +23,6 @@ interface UrlRepositoryInterface extends ActiveRecordRepositoryInterface
     ): ?UrlEntity;
 
     public function urlSearchQueryBuilder(UrlSearchForm $form): ActiveQuery;
+
+    public function isUrlExist(string $url): bool;
 }

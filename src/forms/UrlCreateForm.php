@@ -41,7 +41,7 @@ class UrlCreateForm extends Model
                 }
             }],
             [
-                ['module_name', 'controller_name', 'action_name', 'entity_id'],
+                ['module_name', 'controller_name', 'action_name'],
                 function ($attribute, $params, $validators) {
                     if (0 === preg_match('/^[a-zA-Z0-9_-]*$/', $this->$attribute, $matches)) {
                         $this->addError($attribute, 'Attribute must contain only: characters, digits, underscores and hyphen.');
@@ -49,16 +49,21 @@ class UrlCreateForm extends Model
                 }
             ],
             [
-                ['redirect_to_url'],
+                ['entity_id', 'redirect_to_url'],
                 'integer'
             ],
             [
-                ['module_name', 'controller_name', 'action_name', 'entity_id'],
+                ['module_name', 'controller_name', 'action_name'],
                 'string',
                 'max' => 45
             ],
             [
-                ['module_name', 'redirect_to_url'],
+                ['module_name'],
+                'default',
+                'value' => ''
+            ],
+            [
+                ['redirect_to_url'],
                 'default',
                 'value' => null
             ],

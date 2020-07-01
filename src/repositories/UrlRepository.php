@@ -54,12 +54,9 @@ class UrlRepository extends AbstractActiveRecordRepository implements UrlReposit
      */
     public function urlSearchQueryBuilder(UrlSearchForm $form): ActiveQuery
     {
-        /** @var ActiveQuery $query */
         $query = UrlEntity::find();
         $query->andFilterWhere([
             'id' => $form->id,
-            'created_at' => $form->created_at,
-            'updated_at' => $form->updated_at
         ])->andFilterWhere(['like', 'url', $form->url])
         ->andFilterWhere(['like', 'redirect_to_url', $form->redirect_to_url])
         ->andFilterWhere(['like', 'module_name', $form->module_name])
@@ -67,5 +64,11 @@ class UrlRepository extends AbstractActiveRecordRepository implements UrlReposit
         ->andFilterWhere(['like', 'action_name', $form->action_name])
         ->andFilterWhere(['like', 'entity_id', $form->entity_id]);
         return $query;
+    }
+
+    public function isUrlExist(string $url): bool
+    {
+        $urlEntity = $this->getByUrl($url);
+        return ! empty($urlEntity);
     }
 }

@@ -7,7 +7,7 @@ use yii\di\Container;
 use yii\helpers\Url;
 use Codeception\Example;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UserFixture;
-use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
+use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlEntityFixture;
 
 class UpdateUrlCest
 {
@@ -19,7 +19,7 @@ class UpdateUrlCest
                 'dataFile' => codecept_data_dir() . 'login_data.php'
             ],
             'urls' => [
-                'class' => UrlsFixture::class,
+                'class' => UrlEntityFixture::class,
                 'dataFile' => codecept_data_dir() . 'url_data.php'
             ]
         ];

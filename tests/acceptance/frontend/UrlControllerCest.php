@@ -4,7 +4,7 @@ namespace DmitriiKoziuk\yii2UrlIndex\tests\acceptance;
 
 use Yii;
 use yii\di\Container;
-use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlsFixture;
+use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlEntityFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\AcceptanceTester;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 
@@ -14,7 +14,7 @@ class UrlControllerCest
     {
         return [
             'urls' => [
-                'class' => UrlsFixture::class,
+                'class' => UrlEntityFixture::class,
                 'dataFile' => codecept_data_dir() . 'url_data.php'
             ]
         ];

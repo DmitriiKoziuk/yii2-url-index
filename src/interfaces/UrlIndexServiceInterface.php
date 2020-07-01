@@ -3,35 +3,22 @@
 namespace DmitriiKoziuk\yii2UrlIndex\interfaces;
 
 use yii\db\Connection;
-use yii\data\ActiveDataProvider;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
-use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
-use DmitriiKoziuk\yii2UrlIndex\forms\RemoveEntityForm;
-use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
+use DmitriiKoziuk\yii2UrlIndex\repositories\UrlModuleRepository;
 
 interface UrlIndexServiceInterface
 {
     public function __construct(
         UrlRepositoryInterface $urlRepository,
+        UrlModuleRepository $moduleRepository,
         Connection $db = null
     );
 
-    public function addUrl(UrlCreateForm $urlCreateForm): UrlUpdateForm;
+    public function addUrl(UrlCreateForm $urlCreateForm): UrlEntity;
 
     public function updateUrl(UrlUpdateForm $urlUpdateForm): UrlUpdateForm;
 
     public function removeUrl(string $url): void;
-
-    public function removeEntityUrl(RemoveEntityForm $removeEntityForm): void;
-
-    public function updateEntityUrl(UpdateEntityUrlForm $updateEntityUrlForm): UrlUpdateForm;
-
-    public function getUrlById(int $id): ?UrlUpdateForm;
-
-    public function getUrlByUrl(string $url): ?UrlUpdateForm;
-
-    public function isUrlExist(string $url): bool;
-
-    public function search(UrlSearchForm $urlSearchForm): ActiveDataProvider;
 }

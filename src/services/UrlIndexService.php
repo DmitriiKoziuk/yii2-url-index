@@ -4,83 +4,107 @@ namespace DmitriiKoziuk\yii2UrlIndex\services;
 
 use yii\base\Model;
 use yii\db\Connection;
-use yii\data\ActiveDataProvider;
 use DmitriiKoziuk\yii2Base\services\DBActionService;
 use DmitriiKoziuk\yii2Base\traits\ModelValidatorTrait;
-use DmitriiKoziuk\yii2Base\exceptions\DataNotValidException;
-use DmitriiKoziuk\yii2Base\exceptions\InvalidFormException;
 use DmitriiKoziuk\yii2Base\exceptions\EntityNotValidException;
 use DmitriiKoziuk\yii2Base\exceptions\EntitySaveException;
 use DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
-use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
-use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
-use DmitriiKoziuk\yii2UrlIndex\forms\RemoveEntityForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
+use DmitriiKoziuk\yii2UrlIndex\entities\ModuleEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlModuleRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException;
-use DmitriiKoziuk\yii2UrlIndex\exceptions\EntityUrlNotFoundException;
-use DmitriiKoziuk\yii2UrlIndex\exceptions\RemoveEntityFormNotValidException;
-use DmitriiKoziuk\yii2UrlIndex\exceptions\UpdateEntityUrlFormNotValidException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\forms\UrlCreateFormNotValidException;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\forms\UrlUpdateFormNotValidException;
 
 class UrlIndexService extends DBActionService implements UrlIndexServiceInterface
 {
     use ModelValidatorTrait;
 
-    /**
-     * @var UrlRepositoryInterface
-     */
-    private $urlRepository;
+    private UrlRepositoryInterface $urlRepository;
+    private UrlModuleRepositoryInterface $moduleRepository;
 
     public function __construct(
         UrlRepositoryInterface $urlRepository,
+        UrlModuleRepositoryInterface $moduleRepository,
         Connection $db = null
     ) {
-        $this->urlRepository = $urlRepository;
         parent::__construct($db);
+        $this->urlRepository = $urlRepository;
+        $this->moduleRepository = $moduleRepository;
     }
 
     /**
      * @param UrlCreateForm $urlCreateForm
-     * @return UrlUpdateForm
-     *@throws ExternalComponentException
+     * @return UrlEntity
+     * @throws ExternalComponentException
      * @throws UrlAlreadyHasBeenTakenException
-     * @throws DataNotValidException|InvalidFormException
+     * @throws UrlCreateFormNotValidException
+     * @throws \Throwable
      */
-    public function addUrl(UrlCreateForm $urlCreateForm): UrlUpdateForm
+    public function addUrl(UrlCreateForm $urlCreateForm): UrlEntity
     {
-        $this->validateModels(
-            [$urlCreateForm],
-            new InvalidFormException('UrlCreateForm not valid.')
-        );
-        if ($this->isUrlExist($urlCreateForm->url)) {
+        if (! $urlCreateForm->validate()) {
+            throw new UrlCreateFormNotValidException();
+        }
+        $existUrlEntity = $this->urlRepository->getByUrl($urlCreateForm->url);
+        if (
+            ! is_null($existUrlEntity) &&
+            ! $existUrlEntity->isRedirect()
+        ) {
             throw new UrlAlreadyHasBeenTakenException("Url '{$urlCreateForm->url}' already exist in index.");
         }
-        $urlEntity = new UrlEntity();
-        $urlEntity->setAttributes($urlCreateForm->getAttributes());
-        $urlEntity = $this->save($urlEntity);
-        $urlForm = new UrlUpdateForm($urlEntity->getAttributes());
-        return $urlForm;
+        $this->beginTransaction();
+        try {
+            if (
+                ! is_null($existUrlEntity) &&
+                $existUrlEntity->isRedirect()
+            ) {
+                $this->urlRepository->delete($existUrlEntity);
+            }
+            $moduleEntity = $this->moduleRepository->getModule(
+                $urlCreateForm->module_name,
+                $urlCreateForm->controller_name,
+                $urlCreateForm->action_name
+            );
+            if (empty($moduleEntity)) {
+                $moduleEntity = new ModuleEntity();
+                $moduleEntity->module_name = $urlCreateForm->module_name;
+                $moduleEntity->controller_name = $urlCreateForm->controller_name;
+                $moduleEntity->action_name = $urlCreateForm->action_name;
+                $this->moduleRepository->save($moduleEntity);
+            }
+
+            $urlEntity = new UrlEntity();
+            $urlEntity->module_id = $moduleEntity->id;
+            $urlEntity->entity_id = $urlCreateForm->entity_id;
+            $urlEntity->url = $urlCreateForm->url;
+            $this->urlRepository->save($urlEntity);
+            $this->commitTransaction();
+        } catch (\Throwable $e) {
+            $this->rollbackTransaction();
+            throw $e;
+        }
+        return $urlEntity;
     }
 
     /**
      * @param UrlUpdateForm $urlUpdateForm
      * @return UrlUpdateForm
-     * @throws DataNotValidException|InvalidFormException
      * @throws ExternalComponentException
      * @throws UrlAlreadyHasBeenTakenException
-     * @throws UrlNotFoundException
+     * @throws UrlNotFoundException|UrlUpdateFormNotValidException
      */
     public function updateUrl(UrlUpdateForm $urlUpdateForm): UrlUpdateForm
     {
-        $this->validateModels(
-            [$urlUpdateForm],
-            new InvalidFormException('UrlUpdateForm not valid.')
-        );
+        if (! $urlUpdateForm->validate()) {
+            throw new UrlUpdateFormNotValidException();
+        }
 
         $updatedUrl = $this->urlRepository->getById($urlUpdateForm->id);
         if (is_null($updatedUrl)) {
@@ -88,22 +112,29 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         }
 
         $existUrl = $this->urlRepository->getByUrl($urlUpdateForm->url);
-        if (! is_null($existUrl) && ! $existUrl->isRedirect()) {
+        if (
+            ! is_null($existUrl) &&
+            $updatedUrl->id != $existUrl->id &&
+            ! $existUrl->isRedirect()
+        ) {
             throw new UrlAlreadyHasBeenTakenException("Url '{$urlUpdateForm->url}' already exist in index.");
         }
 
         try {
             $this->beginTransaction();
-            if (! is_null($existUrl)) {
+            if (
+                ! is_null($existUrl) &&
+                $updatedUrl->id != $existUrl->id &&
+                $existUrl->isRedirect()
+            ) {
                 $this->urlRepository->delete($existUrl);
             }
-            $urlForm = $this->_updateUrl(
+            $this->_updateUrl(
                 $updatedUrl,
-                $urlUpdateForm,
-                $existUrl
+                $urlUpdateForm
             );
             $this->commitTransaction();
-            return $urlForm;
+            return $urlUpdateForm;
         } catch (ExternalComponentException $e) {
             $this->rollbackTransaction();
             throw $e;
@@ -138,121 +169,22 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
     }
 
     /**
-     * @param RemoveEntityForm $removeEntityForm
-     * @throws DataNotValidException|RemoveEntityFormNotValidException
-     * @throws EntityUrlNotFoundException
-     */
-    public function removeEntityUrl(RemoveEntityForm $removeEntityForm): void
-    {
-        $this->validateModels(
-            [$removeEntityForm],
-            new RemoveEntityFormNotValidException('Remove entity form not valid.')
-        );
-
-        $urlEntity = $this->urlRepository->getEntityUrl(
-            $removeEntityForm->module_name,
-            $removeEntityForm->controller_name,
-            $removeEntityForm->action_name,
-            $removeEntityForm->entity_id
-        );
-        if (is_null($urlEntity)) {
-            throw new EntityUrlNotFoundException('Entity url not found. Nothing remove.');
-        }
-
-        $this->urlRepository->delete($urlEntity);
-    }
-
-    public function updateEntityUrl(UpdateEntityUrlForm $updateEntityUrlForm): UrlUpdateForm
-    {
-        $this->validateModels(
-            [$updateEntityUrlForm],
-            new UpdateEntityUrlFormNotValidException('Update entity form not valid.')
-        );
-
-        $updatedUrl = $this->urlRepository->getEntityUrl(
-            $updateEntityUrlForm->module_name,
-            $updateEntityUrlForm->controller_name,
-            $updateEntityUrlForm->action_name,
-            $updateEntityUrlForm->entity_id
-        );
-        if (is_null($updatedUrl)) {
-            throw new EntityUrlNotFoundException('Entity url not found. Nothing update.');
-        }
-
-        $existUrl = $this->urlRepository->getByUrl($updateEntityUrlForm->url);
-        if (
-            ! is_null($existUrl) &&
-            ! $existUrl->isRedirect() &&
-            ! $existUrl->isOwner($updateEntityUrlForm)
-        ) {
-            throw new UrlAlreadyHasBeenTakenException("Url '{$updateEntityUrlForm->url}' already exist in index.");
-        }
-
-        try {
-            $this->beginTransaction();
-            if (
-                ! is_null($existUrl) &&
-                ! $existUrl->isOwner($updateEntityUrlForm)
-            ) {
-                $this->urlRepository->delete($existUrl);
-            }
-            $urlForm = $this->_updateUrl(
-                $updatedUrl,
-                $updateEntityUrlForm,
-                $existUrl
-            );
-            $this->commitTransaction();
-            return $urlForm;
-        } catch (\Exception $e) {
-            $this->rollbackTransaction();
-            throw $e;
-        }
-    }
-
-    public function getUrlById(int $id): ?UrlUpdateForm
-    {
-        $urlEntity = $this->urlRepository->getById($id);
-        if (empty($urlEntity)) {
-            return null;
-        }
-        return new UrlUpdateForm($urlEntity->getAttributes());
-    }
-
-    public function getUrlByUrl(string $url): ?UrlUpdateForm
-    {
-        $urlEntity = $this->urlRepository->getByUrl($url);
-        if (is_null($urlEntity)) {
-            return null;
-        }
-        return new UrlUpdateForm($urlEntity->getAttributes());
-    }
-
-    public function isUrlExist(string $url): bool
-    {
-        return !is_null($this->urlRepository->getByUrl($url));
-    }
-
-    public function search(UrlSearchForm $urlSearchForm): ActiveDataProvider
-    {
-        return new ActiveDataProvider([
-            'query' => $this->urlRepository->urlSearchQueryBuilder($urlSearchForm),
-        ]);
-    }
-
-    /**
      * @param string $url
-     * @param int $redirectToUrlId
+     * @param UrlEntity $destinationUrlEntity
      * @throws ExternalComponentException
      */
-    private function createRedirectUrl(string $url, int $redirectToUrlId)
+    private function createRedirectUrl(string $url, UrlEntity $destinationUrlEntity)
     {
+        $redirectModuleEntity = $this->moduleRepository->getModule(
+            UrlIndexModule::getId(),
+            'url',
+            'redirect',
+        );
         $redirectUrlEntity = new UrlEntity([
             'url' => $url,
-            'redirect_to_url' => $redirectToUrlId,
-            'module_name' => UrlIndexModule::getId(),
-            'controller_name' => 'url',
-            'action_name' => 'redirect',
-            'entity_id' => '302',
+            'redirect_to_url' => $destinationUrlEntity->id,
+            'module_id' => $redirectModuleEntity->id,
+            'entity_id' => 302,
         ]);
         $this->save($redirectUrlEntity);
     }
@@ -277,27 +209,56 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
 
     /**
      * @param UrlEntity $updatedUrl
-     * @param Model $updateEntityUrlForm
-     * @param UrlEntity|null $existUrl
-     * @return UrlUpdateForm
+     * @param Model|UrlUpdateForm $updateEntityUrlForm
      * @throws ExternalComponentException
      */
     private function _updateUrl(
         UrlEntity $updatedUrl,
-        Model $updateEntityUrlForm,
-        UrlEntity $existUrl = null
-    ): UrlUpdateForm {
+        Model $updateEntityUrlForm
+    ): void {
+        if (empty($updateEntityUrlForm->redirect_to_url)) {
+            $urlModuleEntity = $this->findOrCreateUrlModuleEntity(
+                $updateEntityUrlForm->module_name,
+                $updateEntityUrlForm->controller_name,
+                $updateEntityUrlForm->action_name
+            );
+        } else {
+            $urlModuleEntity = $this->moduleRepository->getRedirectModule();
+        }
+
         $oldUrl = $updatedUrl->url;
-        $updatedUrl->setAttributes($updateEntityUrlForm->getAttributes(
-            null,
-            ['id', 'created_at', 'updated_at']
-        ));
+        $updatedUrl->setAttributes($updateEntityUrlForm->getAttributes([
+            'entity_id',
+            'url',
+        ]));
+        if (! empty($updateEntityUrlForm->redirect_to_url)) {
+            $updatedUrl->redirect_to_url = $updateEntityUrlForm->redirect_to_url;
+        }
+        $updatedUrl->module_id = $urlModuleEntity->id;
         $isUrlChanged = $updatedUrl->isAttributeChanged('url');
         $updatedUrl = $this->save($updatedUrl);
-        $urlForm = new UrlUpdateForm($updatedUrl->getAttributes());
         if ($isUrlChanged) {
-            $this->createRedirectUrl($oldUrl, $updatedUrl->id);
+            $this->createRedirectUrl($oldUrl, $updatedUrl);
         }
-        return $urlForm;
+    }
+
+    private function findOrCreateUrlModuleEntity(
+        string $moduleName,
+        string $controllerName,
+        string $actionName
+    ): ModuleEntity {
+        $moduleEntity = $this->moduleRepository->getModule(
+            $moduleName,
+            $controllerName,
+            $actionName
+        );
+        if (empty($moduleEntity)) {
+            $moduleEntity = new ModuleEntity();
+            $moduleEntity->module_name = $moduleName;
+            $moduleEntity->controller_name = $controllerName;
+            $moduleEntity->action_name = $actionName;
+            $this->moduleRepository->save($moduleEntity);
+        }
+        return $moduleEntity;
     }
 }

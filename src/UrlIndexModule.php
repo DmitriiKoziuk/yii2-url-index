@@ -10,8 +10,12 @@ use yii\base\Application as BaseApp;
 use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
 use DmitriiKoziuk\yii2ModuleManager\ModuleManager;
-use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
+use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
+use DmitriiKoziuk\yii2UrlIndex\repositories\UrlModuleRepository;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlModuleRepositoryInterface;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 
 class UrlIndexModule extends Module implements ModuleInterface
 {
@@ -109,19 +113,30 @@ class UrlIndexModule extends Module implements ModuleInterface
     private function registerClassesToDIContainer(BaseApp $app): void
     {
         $this->diContainer->setSingleton(
-            UrlRepository::class,
+            UrlRepositoryInterface::class,
             function () {
                 return new UrlRepository();
             }
         );
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->diContainer->get(UrlRepository::class);
+        $this->diContainer->setSingleton(
+            UrlModuleRepositoryInterface::class,
+            function () {
+                return new UrlModuleRepository();
+            }
+        );
 
-        $this->diContainer->setSingleton(UrlIndexService::class, function () use (
-            $urlRepository
+        /** @var UrlRepository $urlRepository */
+        $urlRepository = $this->diContainer->get(UrlRepositoryInterface::class);
+        /** @var UrlModuleRepository $moduleRepository */
+        $moduleRepository = $this->diContainer->get(UrlModuleRepositoryInterface::class);
+
+        $this->diContainer->setSingleton(UrlIndexServiceInterface::class, function () use (
+            $urlRepository,
+            $moduleRepository
         ) {
             return new UrlIndexService(
                 $urlRepository,
+                $moduleRepository,
                 $this->dbConnection
             );
         });
