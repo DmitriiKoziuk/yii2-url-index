@@ -2,6 +2,8 @@ suite_namespace: DmitriiKoziuk\yii2UrlIndex\tests\acceptance
 actor: AcceptanceTester
 modules:
     enabled:
+        - PhpBrowser:
+              url: http://localhost/
         - Yii2:
               part: [orm, fixtures]
     step_decorators: ~

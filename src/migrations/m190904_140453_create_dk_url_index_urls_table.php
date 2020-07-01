@@ -9,7 +9,8 @@ use yii\db\Migration;
  */
 class m190904_140453_create_dk_url_index_urls_table extends Migration
 {
-    private $tableName = '{{%dk_url_index_urls}}';
+    private string $urlIndexUrlsTableName = '{{%dk_url_index_urls}}';
+    private string $urlIndexModulesTableName = '{{%dk_url_index_modules}}';
 
     /**
      * {@inheritdoc}
@@ -20,43 +21,53 @@ class m190904_140453_create_dk_url_index_urls_table extends Migration
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
-        $this->createTable($this->tableName, [
+        $this->createTable($this->urlIndexUrlsTableName, [
             'id'              => $this->primaryKey(),
+            'module_id'       => $this->integer()->notNull(),
+            'entity_id'       => $this->integer()->unsigned()->notNull(),
             'url'             => $this->string(255)->notNull(),
             'redirect_to_url' => $this->integer()->null()->defaultValue(NULL),
-            'module_name'     => $this->string(45)->defaultValue(NULL),
-            'controller_name' => $this->string(45)->notNull(),
-            'action_name'     => $this->string(45)->notNull(),
-            'entity_id'       => $this->string(45)->notNull(),
             'created_at'      => $this->integer()->unsigned()->notNull(),
             'updated_at'      => $this->integer()->unsigned()->notNull(),
         ], $tableOptions);
         $this->createIndex(
-            'dk_url_index_urls_url_idx',
-            $this->tableName,
-            'url',
-            true
+            'dk_url_index_urls_idx_module_id',
+            $this->urlIndexUrlsTableName,
+            'module_id'
         );
         $this->createIndex(
-            'dk_url_index_urls_entity_idx',
-            $this->tableName,
+            'dk_url_index_urls_idx_module_entity',
+            $this->urlIndexUrlsTableName,
             [
-                'module_name',
-                'controller_name',
-                'action_name',
+                'module_id',
                 'entity_id',
             ]
         );
         $this->createIndex(
-            'dk_url_index_urls_ redirect_to_url_idx',
-            $this->tableName,
+            'dk_url_index_urls_uidx_url',
+            $this->urlIndexUrlsTableName,
+            'url',
+            true
+        );
+        $this->createIndex(
+            'dk_url_index_urls_idx_redirect_to_url',
+            $this->urlIndexUrlsTableName,
             'redirect_to_url'
         );
         $this->addForeignKey(
-            'dk_url_index_urls_redirect_to_url_fk',
-            $this->tableName,
+            'dk_url_index_urls_fk_module_id',
+            $this->urlIndexUrlsTableName,
+            'module_id',
+            $this->urlIndexModulesTableName,
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'dk_url_index_urls_fk_redirect_to_url',
+            $this->urlIndexUrlsTableName,
             'redirect_to_url',
-            $this->tableName,
+            $this->urlIndexUrlsTableName,
             'id',
             'CASCADE',
             'CASCADE'
@@ -68,7 +79,8 @@ class m190904_140453_create_dk_url_index_urls_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('dk_url_index_urls_redirect_to_url_fk', $this->tableName);
-        $this->dropTable($this->tableName);
+        $this->dropForeignKey('dk_url_index_urls_fk_module_id', $this->urlIndexUrlsTableName);
+        $this->dropForeignKey('dk_url_index_urls_fk_redirect_to_url', $this->urlIndexUrlsTableName);
+        $this->dropTable($this->urlIndexUrlsTableName);
     }
 }

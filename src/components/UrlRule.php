@@ -5,36 +5,38 @@ namespace DmitriiKoziuk\yii2UrlIndex\components;
 use yii\base\BaseObject;
 use yii\web\UrlRuleInterface;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
-use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 
 class UrlRule extends BaseObject implements UrlRuleInterface
 {
-    /**
-     * @var UrlIndexServiceInterface
-     */
-    private $urlIndexService;
+    private UrlIndexServiceInterface $urlIndexService;
+
+    private UrlRepositoryInterface $urlRepository;
 
     public function __construct(
-        UrlIndexService $urlIndexService,
+        UrlIndexServiceInterface $urlIndexService,
+        UrlRepositoryInterface $urlRepository,
         $config = []
     ) {
         parent::__construct($config);
         $this->urlIndexService = $urlIndexService;
+        $this->urlRepository = $urlRepository;
     }
 
     public function parseRequest($manager, $request)
     {
-        $url = $this->getUrl($request->getUrl(), $request->isGet);
-        if (is_null($url)) {
+        $urlEntity = $this->getUrl($request->getUrl(), $request->isGet);
+        if (is_null($urlEntity)) {
             return false;
         }
-        $route = ! empty($url->module_name) ? $url->module_name . '/' : '';
-        $route .= $url->controller_name . '/' . $url->action_name;
+        $route = ! empty($urlEntity->moduleEntity->module_name) ? $urlEntity->moduleEntity->module_name . '/' : '';
+        $route .= $urlEntity->moduleEntity->controller_name . '/' . $urlEntity->moduleEntity->action_name;
         return [
             $route,
             [
-                'url' => $url,
+                'url' => $urlEntity,
             ]
         ];
     }
@@ -49,14 +51,14 @@ class UrlRule extends BaseObject implements UrlRuleInterface
      * @param bool $isGetParamsArePresent use yii\web\Request->isGuest
      * @return UrlUpdateForm|null
      */
-    public function getUrl(string $requestedUrl, bool $isGetParamsArePresent): ?UrlUpdateForm
+    public function getUrl(string $requestedUrl, bool $isGetParamsArePresent): ?UrlEntity
     {
-        $url = $this->urlIndexService->getUrlByUrl($requestedUrl);
-        if (is_null($url) && $isGetParamsArePresent) {
-            $url = $this->urlIndexService
-                ->getUrlByUrl($this->cutOutGetParamsFromUrl($requestedUrl));
+        $urlEntity = $this->urlRepository->getByUrl($requestedUrl);
+        if (is_null($urlEntity) && $isGetParamsArePresent) {
+            $urlEntity = $this->urlRepository
+                ->getByUrl($this->cutOutGetParamsFromUrl($requestedUrl));
         }
-        return $url;
+        return $urlEntity;
     }
 
     /**

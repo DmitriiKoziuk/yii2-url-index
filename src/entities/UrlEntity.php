@@ -12,15 +12,17 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
 /**
  * This is the model class for table "{{%dk_url_index_urls}}".
  *
- * @property int    $id
+ * @property int $id
+ * @property int $module_id
+ * @property int $entity_id
  * @property string $url
- * @property int    $redirect_to_url
- * @property string $module_name
- * @property string $controller_name
- * @property string $action_name
- * @property string $entity_id
- * @property int    $created_at
- * @property int    $updated_at
+ * @property int|null $redirect_to_url
+ * @property int $created_at
+ * @property int $updated_at
+ *
+ * @property ModuleEntity $moduleEntity
+ * @property UrlEntity $redirectToUrl
+ * @property UrlEntity[] $urlEntities
  */
 class UrlEntity extends ActiveRecord
 {
@@ -32,45 +34,27 @@ class UrlEntity extends ActiveRecord
         return '{{%dk_url_index_urls}}';
     }
 
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             TimestampBehavior::class,
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
+            [['module_id', 'entity_id', 'url'], 'required'],
+            [['module_id', 'redirect_to_url', 'created_at', 'updated_at'], 'integer'],
+            [['entity_id'], 'integer'],
+            [['url'], 'string', 'max' => 255],
+            [['url'], 'unique'],
             [
-                ['url', 'controller_name', 'action_name', 'entity_id'],
-                'required'
-            ],
-            [
-                ['url'],
-                'string',
-                'max' => 255
-            ],
-            [
-                ['url'],
-                'unique'
-            ],
-            [
-                ['module_name', 'controller_name', 'action_name', 'entity_id'],
-                'string',
-                'max' => 45
-            ],
-            [
-                ['redirect_to_url', 'module_name'],
-                'default',
-                'value' => null
-            ],
-            [
-                ['redirect_to_url', 'created_at', 'updated_at'],
-                'integer'
+                ['module_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => ModuleEntity::class,
+                'targetAttribute' => ['module_id' => 'id']
             ],
             [
                 ['redirect_to_url'],
@@ -82,30 +66,27 @@ class UrlEntity extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'module_id' => Yii::t(UrlIndexModule::TRANSLATE, 'Module ID'),
+            'entity_id' => Yii::t(UrlIndexModule::TRANSLATE, 'Entity ID'),
             'url' => Yii::t(UrlIndexModule::TRANSLATE, 'Url'),
             'redirect_to_url' => Yii::t(UrlIndexModule::TRANSLATE, 'Redirect To Url'),
-            'module_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Module Name'),
-            'controller_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Controller Name'),
-            'action_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Action Name'),
-            'entity_id' => Yii::t(UrlIndexModule::TRANSLATE, 'Entity ID'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
     }
 
-    /**
-     * @return ActiveQuery
-     */
-    public function getRedirectUrl()
+    public function getRedirectUrl(): ActiveQuery
     {
         return $this->hasOne(UrlEntity::class, ['id' => 'redirect_to_url']);
+    }
+
+    public function getModuleEntity(): ActiveQuery
+    {
+        return $this->hasOne(ModuleEntity::class, ['id' => 'module_id']);
     }
 
     public function isRedirect(): bool

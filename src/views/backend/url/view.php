@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 
 /* @var $this yii\web\View */
 /* @var $model DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity */
@@ -37,9 +38,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'url:url',
             'redirect_to_url:url',
-            'module_name',
-            'controller_name',
-            'action_name',
+            [
+                'label' => 'Module name',
+                'value' => $model->moduleEntity->module_name,
+            ],
+            [
+                'label' => 'Controller name',
+                'value' => $model->moduleEntity->controller_name,
+            ],
+            [
+                'label' => 'Action name',
+                'value' => $model->moduleEntity->action_name,
+            ],
             'entity_id',
             'created_at:datetime',
             'updated_at:datetime',

@@ -5,25 +5,35 @@ namespace DmitriiKoziuk\yii2UrlIndex\controllers\backend;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii\filters\VerbFilter;
+use yii\data\ActiveDataProvider;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
-use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
+use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
+use DmitriiKoziuk\yii2UrlIndex\exceptions\forms\UrlUpdateFormNotValidException;
 
 /**
  * FileController implements the CRUD actions for UrlIndexEntity model.
  */
 class UrlController extends Controller
 {
-    /**
-     * @var UrlIndexService
-     */
-    private $urlIndexService;
+    private UrlIndexServiceInterface $urlIndexService;
+    private UrlRepositoryInterface $urlRepository;
 
-    public function __construct($id, $module, UrlIndexService $urlIndexService, $config = [])
-    {
+    public function __construct(
+        $id,
+        $module,
+        UrlIndexServiceInterface $urlIndexService,
+        UrlRepositoryInterface $urlRepository,
+        $config = []
+    ) {
         parent::__construct($id, $module, $config);
         $this->urlIndexService = $urlIndexService;
+        $this->urlRepository = $urlRepository;
     }
 
     /**
@@ -49,7 +59,9 @@ class UrlController extends Controller
     {
         $urlSearchForm = new UrlSearchForm();
         $urlSearchForm->load(Yii::$app->request->queryParams);
-        $dataProvider = $this->urlIndexService->search($urlSearchForm);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $this->urlRepository->urlSearchQueryBuilder($urlSearchForm),
+        ]);
 
         return $this->render('index', [
             'searchModel' => $urlSearchForm,
@@ -65,7 +77,7 @@ class UrlController extends Controller
      */
     public function actionView(int $id)
     {
-        $model = $this->urlIndexService->getUrlById($id);
+        $model = $this->urlRepository->getById($id);
         if (empty($model)) {
             throw new NotFoundHttpException("Url with id '{$id}' not found.");
         }
@@ -75,11 +87,7 @@ class UrlController extends Controller
     }
 
     /**
-     * @return string|\yii\web\Response
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
-     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException
+     * @return string|Response
      */
     public function actionCreate()
     {
@@ -97,24 +105,18 @@ class UrlController extends Controller
 
     /**
      * @param int $id
-     * @return string|\yii\web\Response
+     * @return string|Response
      * @throws NotFoundHttpException
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\DataNotValidException
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\ExternalComponentException
-     * @throws \DmitriiKoziuk\yii2Base\exceptions\InvalidFormException
-     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException
-     * @throws \DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException
      */
     public function actionUpdate(int $id)
     {
-        $urlUpdateForm = $this->urlIndexService->getUrlById($id);
-        if (empty($urlUpdateForm)) {
+        $urlEntity = $this->urlRepository->getById($id);
+        if (empty($urlEntity)) {
             throw new NotFoundHttpException("Url with id '{$id}' not found.");
         }
-        if ($urlUpdateForm->load(Yii::$app->request->post())) {
-            $urlUpdateForm = $this->urlIndexService->updateUrl($urlUpdateForm);
-            return $this->redirect(['view', 'id' => $urlUpdateForm->id]);
-        }
+        $urlUpdateForm = new UrlUpdateForm();
+        $this->loadDataToUrlUpdateFormFromUrlEntity($urlUpdateForm, $urlEntity);
+        $this->updateUrl($urlUpdateForm);
         return $this->render('update', [
             'model' => $urlUpdateForm,
         ]);
@@ -129,11 +131,47 @@ class UrlController extends Controller
      */
     public function actionDelete(int $id)
     {
-        $url = $this->urlIndexService->getUrlById($id);
+        $url = $this->urlRepository->getById($id);
         if (empty($url)) {
             throw new NotFoundHttpException("Url with id '{$id}' not found.");
         }
         $this->urlIndexService->removeUrl($url['url']);
         return $this->redirect(['index']);
+    }
+
+    private function loadDataToUrlUpdateFormFromUrlEntity(UrlUpdateForm $form, UrlEntity $entity)
+    {
+        $form->setAttributes($entity->getAttributes(null, [
+            'module_id',
+            'created_at',
+            'updated_at',
+        ]));
+        $form->setAttributes($entity->moduleEntity->getAttributes(null, [
+            'id',
+            'created_at',
+            'updated_at',
+        ]));
+    }
+
+    private function updateUrl(UrlUpdateForm $form)
+    {
+        if (
+            Yii::$app->request->isPost &&
+            $form->load(Yii::$app->request->post())
+        ) {
+            try {
+                if (! $form->validate()) {
+                    throw new UrlUpdateFormNotValidException();
+                }
+                $this->urlIndexService->updateUrl($form);
+                return $this->redirect(['view', 'id' => $form->id]);
+            } catch (UrlUpdateFormNotValidException $e) {
+                Yii::info($e);
+            } catch (\Throwable $e) {
+                Yii::error($e);
+            }
+        }
+
+        return false;
     }
 }

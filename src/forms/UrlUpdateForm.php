@@ -6,10 +6,6 @@ class UrlUpdateForm extends UrlCreateForm
 {
     public $id;
 
-    public $created_at;
-
-    public $updated_at;
-
     /**
      * {@inheritdoc}
      */
@@ -20,7 +16,7 @@ class UrlUpdateForm extends UrlCreateForm
             ['id'], 'required'
         ];
         $rules[] = [
-            ['id', 'created_at', 'updated_at'], 'integer'
+            ['id'], 'integer'
         ];
         return $rules;
     }
