@@ -7,8 +7,6 @@ return [
         'entity_id' => 1,
         'url' => '/some-url',
         'redirect_to_url' => null,
-        'created_at' => 1,
-        'updated_at' => 1,
     ],
     'shopUrl1' => [
         'id' => 2,
@@ -16,8 +14,6 @@ return [
         'entity_id' => 1,
         'url' => '/product-one',
         'redirect_to_url' => null,
-        'created_at' => 1,
-        'updated_at' => 1,
     ],
     'shopUrl2' => [
         'id' => 3,
@@ -25,8 +21,6 @@ return [
         'entity_id' => 2,
         'url' => '/product-two',
         'redirect_to_url' => null,
-        'created_at' => 1,
-        'updated_at' => 1,
     ],
     'shopRedirect1' => [
         'id' => 4,
@@ -34,8 +28,6 @@ return [
         'entity_id' => 302,
         'url' => '/product-one-first-redirect',
         'redirect_to_url' => 2,
-        'created_at' => 1,
-        'updated_at' => 1,
     ],
     'shopRedirect2' => [
         'id' => 5,
@@ -43,7 +35,5 @@ return [
         'entity_id' => 302,
         'url' => '/product-one-second-redirect',
         'redirect_to_url' => 2,
-        'created_at' => 1,
-        'updated_at' => 1,
     ],
 ];
