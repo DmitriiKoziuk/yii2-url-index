@@ -79,7 +79,6 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
                 $moduleEntity->action_name = $urlCreateForm->action_name;
                 $this->moduleRepository->save($moduleEntity);
             }
-
             $urlEntity = new UrlEntity();
             $urlEntity->module_id = $moduleEntity->id;
             $urlEntity->entity_id = $urlCreateForm->entity_id;
@@ -105,12 +104,10 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         if (! $urlUpdateForm->validate()) {
             throw new UrlUpdateFormNotValidException();
         }
-
         $updatedUrl = $this->urlRepository->getById($urlUpdateForm->id);
         if (is_null($updatedUrl)) {
             throw new UrlNotFoundException("Url with id '{$urlUpdateForm->id}' not found.");
         }
-
         $existUrl = $this->urlRepository->getByUrl($urlUpdateForm->url);
         if (
             ! is_null($existUrl) &&
@@ -119,7 +116,6 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         ) {
             throw new UrlAlreadyHasBeenTakenException("Url '{$urlUpdateForm->url}' already exist in index.");
         }
-
         try {
             $this->beginTransaction();
             if (
@@ -199,7 +195,7 @@ class UrlIndexService extends DBActionService implements UrlIndexServiceInterfac
         try {
             /** @var UrlEntity $urlEntity */
             $urlEntity = $this->urlRepository->save($urlEntity);
-        } catch (EntityNotValidException| EntitySaveException $e) {
+        } catch (EntityNotValidException | EntitySaveException $e) {
             $externalException = new ExternalComponentException();
             $externalException->addErrors([$e]);
             throw $externalException;
