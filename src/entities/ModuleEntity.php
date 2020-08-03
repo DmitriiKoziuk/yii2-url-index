@@ -4,7 +4,7 @@ namespace DmitriiKoziuk\yii2UrlIndex\entities;
 
 use Yii;
 use yii\db\ActiveQuery;
-use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 
 /**
@@ -14,36 +14,23 @@ use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
  * @property string $module_name
  * @property string $controller_name
  * @property string $action_name
- * @property int $created_at
- * @property int $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property UrlEntity[] $urls
  */
-class ModuleEntity extends \yii\db\ActiveRecord
+class ModuleEntity extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName(): string
     {
         return '{{%dk_url_index_modules}}';
     }
 
-    public function behaviors(): array
-    {
-        return [
-            TimestampBehavior::class,
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function rules(): array
     {
         return [
             [['controller_name', 'action_name'], 'required'],
-            [['created_at', 'updated_at'], 'integer'],
+            [['created_at', 'updated_at'], 'date', 'format' => 'php:Y-m-d H:m:s'],
             [['module_name', 'controller_name', 'action_name'], 'string', 'max' => 45],
             [
                 [
@@ -60,12 +47,12 @@ class ModuleEntity extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id' => Yii::t('app', 'ID'),
+            'id' => Yii::t(UrlIndexModule::TRANSLATE, 'ID'),
             'module_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Module Name'),
             'controller_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Controller Name'),
             'action_name' => Yii::t(UrlIndexModule::TRANSLATE, 'Action Name'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
+            'created_at' => Yii::t(UrlIndexModule::TRANSLATE, 'Created At'),
+            'updated_at' => Yii::t(UrlIndexModule::TRANSLATE, 'Updated At'),
         ];
     }
 

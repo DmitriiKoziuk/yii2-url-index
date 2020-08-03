@@ -5,7 +5,6 @@ namespace DmitriiKoziuk\yii2UrlIndex\entities;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
-use yii\behaviors\TimestampBehavior;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
 use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
 
@@ -17,8 +16,8 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
  * @property int $entity_id
  * @property string $url
  * @property int|null $redirect_to_url
- * @property int $created_at
- * @property int $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property ModuleEntity $moduleEntity
  * @property UrlEntity $redirectToUrl
@@ -26,27 +25,18 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
  */
 class UrlEntity extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return '{{%dk_url_index_urls}}';
-    }
-
-    public function behaviors(): array
-    {
-        return [
-            TimestampBehavior::class,
-        ];
     }
 
     public function rules(): array
     {
         return [
             [['module_id', 'entity_id', 'url'], 'required'],
-            [['module_id', 'redirect_to_url', 'created_at', 'updated_at'], 'integer'],
+            [['module_id', 'redirect_to_url'], 'integer'],
             [['entity_id'], 'integer'],
+            [['created_at', 'updated_at'], 'date', 'format' => 'php:Y-m-d H:m:s'],
             [['url'], 'string', 'max' => 255],
             [['url'], 'unique'],
             [
@@ -69,13 +59,13 @@ class UrlEntity extends ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id' => Yii::t('app', 'ID'),
+            'id' => Yii::t(UrlIndexModule::TRANSLATE, 'ID'),
             'module_id' => Yii::t(UrlIndexModule::TRANSLATE, 'Module ID'),
             'entity_id' => Yii::t(UrlIndexModule::TRANSLATE, 'Entity ID'),
             'url' => Yii::t(UrlIndexModule::TRANSLATE, 'Url'),
             'redirect_to_url' => Yii::t(UrlIndexModule::TRANSLATE, 'Redirect To Url'),
-            'created_at' => Yii::t('app', 'Created At'),
-            'updated_at' => Yii::t('app', 'Updated At'),
+            'created_at' => Yii::t(UrlIndexModule::TRANSLATE, 'Created At'),
+            'updated_at' => Yii::t(UrlIndexModule::TRANSLATE, 'Updated At'),
         ];
     }
 
