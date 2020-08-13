@@ -19,7 +19,7 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UpdateEntityUrlForm;
  * @property string $created_at
  * @property string $updated_at
  *
- * @property ModuleEntity $moduleEntity
+ * @property UrlModuleEntity $moduleEntity
  * @property UrlEntity $redirectToUrl
  * @property UrlEntity[] $urlEntities
  */
@@ -36,14 +36,14 @@ class UrlEntity extends ActiveRecord
             [['module_id', 'entity_id', 'url'], 'required'],
             [['module_id', 'redirect_to_url'], 'integer'],
             [['entity_id'], 'integer'],
-            [['created_at', 'updated_at'], 'date', 'format' => 'php:Y-m-d H:m:s'],
+            [['created_at', 'updated_at'], 'datetime', 'format' => 'php:Y-m-d H:i:s'],
             [['url'], 'string', 'max' => 255],
             [['url'], 'unique'],
             [
                 ['module_id'],
                 'exist',
                 'skipOnError' => true,
-                'targetClass' => ModuleEntity::class,
+                'targetClass' => UrlModuleEntity::class,
                 'targetAttribute' => ['module_id' => 'id']
             ],
             [
@@ -76,7 +76,7 @@ class UrlEntity extends ActiveRecord
 
     public function getModuleEntity(): ActiveQuery
     {
-        return $this->hasOne(ModuleEntity::class, ['id' => 'module_id']);
+        return $this->hasOne(UrlModuleEntity::class, ['id' => 'module_id']);
     }
 
     public function isRedirect(): bool

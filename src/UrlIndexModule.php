@@ -2,6 +2,7 @@
 
 namespace DmitriiKoziuk\yii2UrlIndex;
 
+use InvalidArgumentException;
 use yii\di\Container;
 use yii\db\Connection;
 use yii\base\Module;
@@ -11,6 +12,7 @@ use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
 use DmitriiKoziuk\yii2ModuleManager\ModuleManager;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexUpdateService;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlModuleRepository;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlModuleRepositoryInterface;
@@ -23,27 +25,18 @@ class UrlIndexModule extends Module implements ModuleInterface
 
     const TRANSLATE = self::ID;
 
-    /**
-     * @var Container
-     */
-    public $diContainer;
-
-    /**
-     * @var Connection
-     */
-    public $dbConnection;
+    public Container $diContainer;
+    public Connection $dbConnection;
 
     /**
      * Overwrite this param if you backend app id is different from default.
-     * @var string
      */
-    public $backendAppId;
+    public string $backendAppId;
 
     /**
      * Overwrite this param if you backend app id is different from default.
-     * @var string
      */
-    public $frontendAppId;
+    public string $frontendAppId;
 
     public static function getId(): string
     {
@@ -68,17 +61,17 @@ class UrlIndexModule extends Module implements ModuleInterface
         $app = $this->module;
         $this->initLocalProperties($app);
         $this->registerTranslation($app);
-        $this->registerClassesToDIContainer($app);
+        $this->registerClassesToDIContainer();
         $this->registerUrlRules($app);
     }
 
     private function initLocalProperties(BaseApp $app)
     {
         if (empty($this->backendAppId)) {
-            throw new \InvalidArgumentException('Property backendAppId not set.');
+            throw new InvalidArgumentException('Property backendAppId not set.');
         }
         if (empty($this->frontendAppId)) {
-            throw new \InvalidArgumentException('Property frontendAppId not set.');
+            throw new InvalidArgumentException('Property frontendAppId not set.');
         }
         if ($app instanceof WebApp && $app->id == $this->backendAppId) {
             $this->controllerNamespace = __NAMESPACE__ . '\controllers\backend';
@@ -105,41 +98,12 @@ class UrlIndexModule extends Module implements ModuleInterface
         ];
     }
 
-    /**
-     * @param BaseApp $app
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\di\NotInstantiableException
-     */
-    private function registerClassesToDIContainer(BaseApp $app): void
+    private function registerClassesToDIContainer(): void
     {
-        $this->diContainer->setSingleton(
-            UrlRepositoryInterface::class,
-            function () {
-                return new UrlRepository();
-            }
-        );
-        $this->diContainer->setSingleton(
-            UrlModuleRepositoryInterface::class,
-            function () {
-                return new UrlModuleRepository();
-            }
-        );
-
-        /** @var UrlRepository $urlRepository */
-        $urlRepository = $this->diContainer->get(UrlRepositoryInterface::class);
-        /** @var UrlModuleRepository $moduleRepository */
-        $moduleRepository = $this->diContainer->get(UrlModuleRepositoryInterface::class);
-
-        $this->diContainer->setSingleton(UrlIndexServiceInterface::class, function () use (
-            $urlRepository,
-            $moduleRepository
-        ) {
-            return new UrlIndexService(
-                $urlRepository,
-                $moduleRepository,
-                $this->dbConnection
-            );
-        });
+        $this->diContainer->setSingleton(UrlRepositoryInterface::class, UrlRepository::class);
+        $this->diContainer->setSingleton(UrlModuleRepositoryInterface::class, UrlModuleRepository::class);
+        $this->diContainer->setSingleton(UrlIndexServiceInterface::class, UrlIndexService::class);
+        $this->diContainer->setSingleton(UrlIndexUpdateService::class);
     }
 
     private function registerUrlRules(BaseApp $app): void

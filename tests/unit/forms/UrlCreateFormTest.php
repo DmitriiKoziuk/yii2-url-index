@@ -42,7 +42,6 @@ class UrlCreateFormTest extends Unit
         $form = new UrlCreateForm([$attributeName => $attributeValue]);
         $this->assertFalse($form->validate());
         $this->assertTrue($form->hasErrors($attributeName));
-        $this->assertContains($attributeErrorMessage, $form->getErrors()[ $attributeName ]);
     }
 
     public function validUrlDataProvider()

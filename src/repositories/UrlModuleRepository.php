@@ -5,7 +5,7 @@ namespace DmitriiKoziuk\yii2UrlIndex\repositories;
 use DmitriiKoziuk\yii2Base\repositories\AbstractActiveRecordRepository;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlModuleRepositoryInterface;
 use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
-use DmitriiKoziuk\yii2UrlIndex\entities\ModuleEntity;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlModuleEntity;
 
 class UrlModuleRepository extends AbstractActiveRecordRepository implements UrlModuleRepositoryInterface
 {
@@ -13,10 +13,9 @@ class UrlModuleRepository extends AbstractActiveRecordRepository implements UrlM
         string $moduleName,
         string $controllerName,
         string $actionName
-    ): ?ModuleEntity
-    {
-        /** @var ModuleEntity|null $moduleEntity */
-        $moduleEntity = ModuleEntity::find()
+    ): ?UrlModuleEntity {
+        /** @var UrlModuleEntity|null $moduleEntity */
+        $moduleEntity = UrlModuleEntity::find()
             ->where([
                 'module_name' => $moduleName,
                 'controller_name' => $controllerName,
@@ -25,10 +24,10 @@ class UrlModuleRepository extends AbstractActiveRecordRepository implements UrlM
         return $moduleEntity;
     }
 
-    public function getRedirectModule(): ModuleEntity
+    public function getRedirectModule(): UrlModuleEntity
     {
-        /** @var ModuleEntity|null $moduleEntity */
-        $moduleEntity = ModuleEntity::find()
+        /** @var UrlModuleEntity|null $moduleEntity */
+        $moduleEntity = UrlModuleEntity::find()
             ->where([
                 'module_name' => UrlIndexModule::getId(),
                 'controller_name' => 'url',

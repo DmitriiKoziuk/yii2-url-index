@@ -9,7 +9,7 @@ use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\ModuleEntityFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlEntityFixture;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
-use DmitriiKoziuk\yii2UrlIndex\entities\ModuleEntity;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlModuleEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\forms\UrlUpdateFormNotValidException;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlNotFoundException;
@@ -41,7 +41,7 @@ class UrlIndexServiceMethodUpdateUrlTest extends Unit
     {
         /** @var UrlIndexServiceInterface $service */
         $service = Yii::$container->get(UrlIndexServiceInterface::class);
-        /** @var ModuleEntity $moduleEntityFixture */
+        /** @var UrlModuleEntity $moduleEntityFixture */
         $moduleEntityFixture = $this->tester->grabFixture('modules', 'shopModule');
         /** @var UrlEntity $urlEntityFixture */
         $urlEntityFixture = $this->tester->grabFixture('urls', 'shopUrl1');
@@ -65,7 +65,7 @@ class UrlIndexServiceMethodUpdateUrlTest extends Unit
     {
         /** @var UrlIndexServiceInterface $service */
         $service = Yii::$container->get(UrlIndexServiceInterface::class);
-        /** @var ModuleEntity $moduleEntityFixture */
+        /** @var UrlModuleEntity $moduleEntityFixture */
         $moduleEntityFixture = $this->tester->grabFixture('modules', 'shopModule');
         /** @var UrlEntity $urlEntityFixture */
         $urlEntityFixture = $this->tester->grabFixture('urls', 'shopUrl1');
@@ -101,9 +101,9 @@ class UrlIndexServiceMethodUpdateUrlTest extends Unit
     {
         /** @var UrlIndexServiceInterface $service */
         $service = Yii::$container->get(UrlIndexServiceInterface::class);
-        /** @var ModuleEntity $redirectModuleEntityFixture */
+        /** @var UrlModuleEntity $redirectModuleEntityFixture */
         $redirectModuleEntityFixture = $this->tester->grabFixture('modules', 'redirectModule');
-        /** @var ModuleEntity $shopModuleEntityFixture */
+        /** @var UrlModuleEntity $shopModuleEntityFixture */
         $shopModuleEntityFixture = $this->tester->grabFixture('modules', 'shopModule');
         /** @var UrlEntity $updatedUrlEntityFixture */
         $updatedUrlEntityFixture = $this->tester->grabFixture('urls', 'shopUrl1');

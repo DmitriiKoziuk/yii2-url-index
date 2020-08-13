@@ -3,12 +3,14 @@
 namespace DmitriiKoziuk\yii2UrlIndex\tests\unit\repositories;
 
 use Yii;
-use yii\di\Container;
 use Codeception\Test\Unit;
+use yii\di\Container;
+use yii\di\NotInstantiableException;
+use yii\base\InvalidConfigException;
 use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\ModuleEntityFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlEntityFixture;
-use DmitriiKoziuk\yii2UrlIndex\entities\ModuleEntity;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlModuleEntity;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlModuleRepository;
 
 class ModuleRepositoryTest extends Unit
@@ -28,6 +30,10 @@ class ModuleRepositoryTest extends Unit
         Yii::$container = new Container();
     }
 
+    /**
+     * @throws InvalidConfigException
+     * @throws NotInstantiableException
+     */
     public function testMethodGetModuleReturnNull()
     {
         /** @var UrlModuleRepository $moduleRepository */
@@ -36,12 +42,12 @@ class ModuleRepositoryTest extends Unit
         $controllerName = 'notExistModule';
         $actionName = 'notExistModule';
 
-        $this->tester->dontSeeRecord(ModuleEntity::class, [
+        $this->tester->dontSeeRecord(UrlModuleEntity::class, [
             'module_name' => $moduleName,
             'controller_name' => $controllerName,
             'action_name' => $actionName,
         ]);
-        /** @var ModuleEntity $moduleEntity */
+        /** @var UrlModuleEntity $moduleEntity */
         $moduleEntity = $moduleRepository->getModule(
             $moduleName,
             $controllerName,
@@ -52,29 +58,29 @@ class ModuleRepositoryTest extends Unit
 
     /**
      * @param string $fixtureIndex
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\di\NotInstantiableException
+     * @throws InvalidConfigException
+     * @throws NotInstantiableException
      * @dataProvider moduleEntityExistFixtureNameDataProvider
      */
     public function testMethodGetModuleReturnExistModule(string $fixtureIndex)
     {
-        /** @var ModuleEntity $fixtureModuleEntity */
+        /** @var UrlModuleEntity $fixtureModuleEntity */
         $fixtureModuleEntity = $this->tester->grabFixture('modules', $fixtureIndex);
         /** @var UrlModuleRepository $moduleRepository */
         $moduleRepository = Yii::$container->get(UrlModuleRepository::class);
 
-        $this->tester->seeRecord(ModuleEntity::class, [
+        $this->tester->seeRecord(UrlModuleEntity::class, [
             'module_name' => $fixtureModuleEntity->module_name,
             'controller_name' => $fixtureModuleEntity->controller_name,
             'action_name' => $fixtureModuleEntity->action_name,
         ]);
-        /** @var ModuleEntity $moduleEntity */
+        /** @var UrlModuleEntity $moduleEntity */
         $moduleEntity = $moduleRepository->getModule(
             $fixtureModuleEntity->module_name,
             $fixtureModuleEntity->controller_name,
             $fixtureModuleEntity->action_name
         );
-        $this->assertInstanceOf(ModuleEntity::class, $moduleEntity);
+        $this->assertInstanceOf(UrlModuleEntity::class, $moduleEntity);
         $this->assertEquals($fixtureModuleEntity->id, $moduleEntity->id);
     }
 

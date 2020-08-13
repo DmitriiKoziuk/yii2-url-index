@@ -11,10 +11,7 @@ use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 
 class UrlUpdateFormTest extends Unit
 {
-    /**
-     * @var UnitTester
-     */
-    protected $tester;
+    protected UnitTester $tester;
 
     protected function _after()
     {
@@ -43,7 +40,6 @@ class UrlUpdateFormTest extends Unit
         $form = new UrlUpdateForm([$attributeName => $attributeValue]);
         $this->assertFalse($form->validate());
         $this->assertTrue($form->hasErrors($attributeName));
-        $this->assertContains($attributeErrorMessage, $form->getErrors()[ $attributeName ]);
     }
 
     public function validDataProvider()
@@ -58,8 +54,6 @@ class UrlUpdateFormTest extends Unit
                     'controller_name' => 'controller',
                     'action_name' => 'action',
                     'entity_id' => '1',
-                    'created_at' => '1392559490',
-                    'updated_at' => '1392559490',
                 ],
             ],
             [
@@ -71,8 +65,6 @@ class UrlUpdateFormTest extends Unit
                     'controller_name' => 'controller',
                     'action_name' => 'action',
                     'entity_id' => '2',
-                    'created_at' => '1392569490',
-                    'updated_at' => '1392569490',
                 ],
             ],
             [
@@ -84,8 +76,6 @@ class UrlUpdateFormTest extends Unit
                     'controller_name' => 'url',
                     'action_name' => 'redirect',
                     'entity_id' => '302',
-                    'created_at' => '1392569490',
-                    'updated_at' => '1392569490',
                 ],
             ],
         ];

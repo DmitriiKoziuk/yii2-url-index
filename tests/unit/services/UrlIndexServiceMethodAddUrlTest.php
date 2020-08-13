@@ -8,7 +8,7 @@ use DmitriiKoziuk\yii2UrlIndex\tests\UnitTester;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\ModuleEntityFixture;
 use DmitriiKoziuk\yii2UrlIndex\tests\_fixtures\UrlEntityFixture;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
-use DmitriiKoziuk\yii2UrlIndex\entities\ModuleEntity;
+use DmitriiKoziuk\yii2UrlIndex\entities\UrlModuleEntity;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
 use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\UrlAlreadyHasBeenTakenException;
@@ -40,7 +40,7 @@ class UrlIndexServiceMethodAddUrlTest extends Unit
 
     public function testThrowExceptionIfUrlAlreadyHasBeenTaken()
     {
-        /** @var ModuleEntity $moduleEntityFixture */
+        /** @var UrlModuleEntity $moduleEntityFixture */
         $moduleEntityFixture = $this->tester->grabFixture('modules', 'shopModule');
         /** @var UrlEntity $urlEntityFixture */
         $urlEntityFixture = $this->tester->grabFixture('urls', 'shopUrl1');
@@ -63,7 +63,7 @@ class UrlIndexServiceMethodAddUrlTest extends Unit
 
     public function testAddUrlWithValidData()
     {
-        /** @var ModuleEntity $moduleEntityFixture */
+        /** @var UrlModuleEntity $moduleEntityFixture */
         $moduleEntityFixture = $this->tester->grabFixture('modules', 'shopModule');
         /** @var UrlIndexServiceInterface $service */
         $service = Yii::$container->get(UrlIndexServiceInterface::class);

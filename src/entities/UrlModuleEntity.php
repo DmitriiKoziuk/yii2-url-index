@@ -19,7 +19,7 @@ use DmitriiKoziuk\yii2UrlIndex\UrlIndexModule;
  *
  * @property UrlEntity[] $urls
  */
-class ModuleEntity extends ActiveRecord
+class UrlModuleEntity extends ActiveRecord
 {
     public static function tableName(): string
     {
@@ -30,7 +30,7 @@ class ModuleEntity extends ActiveRecord
     {
         return [
             [['controller_name', 'action_name'], 'required'],
-            [['created_at', 'updated_at'], 'date', 'format' => 'php:Y-m-d H:m:s'],
+            [['created_at', 'updated_at'], 'date', 'format' => 'php:Y-m-d H:i:s'],
             [['module_name', 'controller_name', 'action_name'], 'string', 'max' => 45],
             [
                 [

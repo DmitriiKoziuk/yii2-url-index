@@ -3,17 +3,19 @@
 namespace DmitriiKoziuk\yii2UrlIndex\controllers\backend;
 
 use Yii;
+use Throwable;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use yii\data\ActiveDataProvider;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
+use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlCreateForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlSearchForm;
 use DmitriiKoziuk\yii2UrlIndex\forms\UrlUpdateForm;
 use DmitriiKoziuk\yii2UrlIndex\entities\UrlEntity;
-use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlIndexServiceInterface;
-use DmitriiKoziuk\yii2UrlIndex\interfaces\UrlRepositoryInterface;
+use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexUpdateService;
 use DmitriiKoziuk\yii2UrlIndex\exceptions\forms\UrlUpdateFormNotValidException;
 
 /**
@@ -23,17 +25,20 @@ class UrlController extends Controller
 {
     private UrlIndexServiceInterface $urlIndexService;
     private UrlRepositoryInterface $urlRepository;
+    private UrlIndexUpdateService $updateService;
 
     public function __construct(
         $id,
         $module,
         UrlIndexServiceInterface $urlIndexService,
         UrlRepositoryInterface $urlRepository,
+        UrlIndexUpdateService $updateService,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
         $this->urlIndexService = $urlIndexService;
         $this->urlRepository = $urlRepository;
+        $this->updateService = $updateService;
     }
 
     /**
@@ -163,12 +168,12 @@ class UrlController extends Controller
                 if (! $form->validate()) {
                     throw new UrlUpdateFormNotValidException();
                 }
-                $this->urlIndexService->updateUrl($form);
+                $this->updateService->updateUrl($form);
                 return $this->redirect(['view', 'id' => $form->id]);
             } catch (UrlUpdateFormNotValidException $e) {
                 Yii::info($e);
-            } catch (\Throwable $e) {
-                Yii::error($e);
+            } catch (Throwable $t) {
+                Yii::error($t);
             }
         }
 
