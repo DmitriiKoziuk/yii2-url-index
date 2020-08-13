@@ -17,10 +17,6 @@ class m190904_140453_create_dk_url_index_urls_table extends Migration
      */
     public function safeUp()
     {
-        $tableOptions = null;
-        if ($this->db->driverName === 'mysql') {
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-        }
         $this->createTable($this->urlIndexUrlsTableName, [
             'id'              => $this->primaryKey(),
             'module_id'       => $this->integer()->notNull(),
@@ -29,7 +25,7 @@ class m190904_140453_create_dk_url_index_urls_table extends Migration
             'redirect_to_url' => $this->integer()->null()->defaultValue(NULL),
             'created_at'      => $this->integer()->unsigned()->notNull(),
             'updated_at'      => $this->integer()->unsigned()->notNull(),
-        ], $tableOptions);
+        ]);
         $this->createIndex(
             'dk_url_index_urls_idx_module_id',
             $this->urlIndexUrlsTableName,
