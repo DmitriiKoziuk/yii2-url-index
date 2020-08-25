@@ -108,12 +108,13 @@ class UrlIndexModule extends Module implements ModuleInterface
 
     private function registerUrlRules(BaseApp $app): void
     {
-        if ($app instanceof WebApp && $app->id == $this->frontendAppId) {
+        //TODO do something with this
+        /*if ($app instanceof WebApp && $app->id == $this->frontendAppId) {
             $app->getUrlManager()->addRules([
                 [
                     'class' => __NAMESPACE__ . '\components\UrlRule',
                 ],
             ]);
-        }
+        }*/
     }
 }
