@@ -11,6 +11,7 @@ use yii\base\Application as BaseApp;
 use yii\console\Application as ConsoleApp;
 use DmitriiKoziuk\yii2ModuleManager\interfaces\ModuleInterface;
 use DmitriiKoziuk\yii2ModuleManager\ModuleManager;
+use DmitriiKoziuk\yii2ConfigManager\ConfigManagerModule;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexService;
 use DmitriiKoziuk\yii2UrlIndex\services\UrlIndexUpdateService;
 use DmitriiKoziuk\yii2UrlIndex\repositories\UrlRepository;
@@ -52,6 +53,7 @@ class UrlIndexModule extends Module implements ModuleInterface
     {
         return [
             ModuleManager::class,
+            ConfigManagerModule::class,
         ];
     }
 
